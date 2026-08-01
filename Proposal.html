@@ -155,6 +155,18 @@
   .foot{border-top:1px solid var(--line);padding:30px 0 60px;text-align:center;color:var(--muted);font-size:13px}
   .foot .fl{font-family:var(--font-d);font-weight:600;color:var(--ink);font-size:15px;margin-bottom:6px}
   .foot .terms{max-width:66ch;margin:10px auto 0;font-size:12px;line-height:1.6}
+  /* ---- mobile ---- */
+  @media(max-width:760px){
+    .wrap{padding:0 20px}
+    .hero{padding:40px 0 20px}
+    .roi{padding:24px 16px}
+    .roitbl{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+    .addon-tbl{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .cta-band,.roi{border-radius:16px}
+    .cta-band{padding:32px 20px}
+    .upgrade{padding:26px 20px}
+    .note,.democta{padding:22px 18px}
+  }
 </style>
 </head>
 <body>
@@ -172,19 +184,19 @@
   <section class="hero">
     <div class="for">PROPOSAL · JULY 2026</div>
     <div class="eyebrow">Prepared for Addy &amp; the Blaze Gourmet Burgers team</div>
-    <h1 style="margin-top:14px">All six locations, on <em>one screen</em> — and hours back for your team.</h1>
+    <h1 style="margin-top:14px">All your locations, on <em>one screen</em> — and hours back for your team.</h1>
     <p class="sub">A single operating system that pulls every Blaze location's POS, bank, delivery apps and reviews into one live view — so your people stop stitching spreadsheets together and get back to the work that actually moves the business.</p>
     <div class="byline">
       <span>Prepared by <b>Viviana Ramos · Forma</b></span><span>·</span>
       <span>Built on the <b>Atelio</b> platform</span><span>·</span>
-      <span>For <b>6 locations</b></span>
+      <span>For <b>every location</b></span>
     </div>
   </section>
 
   <!-- INTRO NOTE -->
   <div class="note">
     <p>Addy — thank you for taking the time yesterday, and for really listening to what we're building. It meant a lot that you engaged with the vision, not just the features.</p>
-    <p>What stuck with us is how much of your team's day disappears into pulling numbers together across six locations. This proposal is our answer to that: a system that does the gathering for them, so their time goes back to hospitality, food, and the people in front of them — the work that actually matters.</p>
+    <p>What stuck with us is how much of your team's day disappears into pulling numbers together across all your locations. This proposal is our answer to that: a system that does the gathering for them, so their time goes back to hospitality, food, and the people in front of them — the work that actually matters.</p>
   </div>
 
   <!-- DEMO CTA -->
@@ -200,8 +212,8 @@
   <!-- OPPORTUNITY -->
   <section class="blk">
     <div class="eyebrow">The opportunity</div>
-    <h2 style="margin-top:8px">Six locations shouldn't mean six times the effort</h2>
-    <p class="lead">Right now, seeing the whole picture means someone on your team logging into different systems, exporting, and rebuilding it by hand — every week, times six. That's hours of skilled people's time spent on assembly instead of judgement.</p>
+    <h2 style="margin-top:8px">More locations shouldn't mean more work</h2>
+    <p class="lead">Right now, seeing the whole picture means someone on your team logging into different systems, exporting, and rebuilding it by hand — every week, across every location. That's hours of skilled people's time spent on assembly instead of judgement.</p>
     <div class="grid g3">
       <div class="pain">
         <h3><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9L2 18a2 2 0 001.7 3h16.6A2 2 0 0022 18L13.7 3.9a2 2 0 00-3.4 0z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>No single view</h3>
@@ -222,13 +234,13 @@
   <section class="blk">
     <div class="eyebrow">What Blaze gets</div>
     <h2 style="margin-top:8px">The Core model — six modules, working from day one</h2>
-    <p class="lead">Everything below is included, for all six locations, at one flat price. This is the system you clicked through in the demo.</p>
+    <p class="lead">Everything below is included, for all your locations, at one flat price. This is the system you clicked through in the demo.</p>
     <div class="grid g3">
-      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2 5 4-12 2 7h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Today Dashboard</h3><p>Live sales, covers, average check and labour % — per location and across all six, with a 3am morning report.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2 5 4-12 2 7h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Today Dashboard</h3><p>Live sales, covers, average check and labour % — per location and across all your locations, with a 3am morning report.</p></div>
       <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><h3>Food Cost &amp; Inventory</h3><p>Recipe-based food-cost % by dish and location, item-mix, week-over-week variance and reorder alerts.</p></div>
       <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18v12H3z" stroke="currentColor" stroke-width="2"/><path d="M3 10h18" stroke="currentColor" stroke-width="2"/></svg></div><h3>Finance &amp; Reconciliation</h3><p>A P&amp;L that builds itself from sales, bank feed and receipts — with suspicious-charge alerts.</p></div>
       <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M3 16V8h11v8M14 11h4l3 3v2h-7" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="7" cy="17" r="1.6" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="17" r="1.6" stroke="currentColor" stroke-width="2"/></svg></div><h3>Delivery Platforms</h3><p>Uber Eats &amp; DoorDash gross-vs-fees-vs-net with payout reconciliation. (Skip auto-sync coming soon.)</p></div>
-      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5 5.5.8-4 4 1 5.5L12 16l-5 2.3 1-5.5-4-4 5.5-.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><h3>Reviews &amp; Reputation</h3><p>Google and Yelp for all six locations in one desk, with replies drafted in your voice.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5 5.5.8-4 4 1 5.5L12 16l-5 2.3 1-5.5-4-4 5.5-.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><h3>Reviews &amp; Reputation</h3><p>Google and Yelp for all your locations in one desk, with replies drafted in your voice.</p></div>
       <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><h3>Reservations &amp; Guests</h3><p>Bookings synced from your POS and OpenTable, with a running guest book across locations.</p></div>
     </div>
   </section>
@@ -237,9 +249,9 @@
   <section class="blk">
     <div class="eyebrow">Onboarding</div>
     <h2 style="margin-top:8px">We set it up for you — your team doesn't lift a finger</h2>
-    <p class="lead">A real person on our side does the import across all six locations. We connect your systems, bring your recipes and menus across, and don't hand over the keys until every number ties out to your own records.</p>
+    <p class="lead">A real person on our side does the import across all your locations. We connect your systems, bring your recipes and menus across, and don't hand over the keys until every number ties out to your own records.</p>
     <div class="steps">
-      <div class="step"><div class="n">01</div><h4>Locations</h4><p>All six set up with your brand, currency and timezone.</p></div>
+      <div class="step"><div class="n">01</div><h4>Locations</h4><p>Every location set up with your brand, currency and timezone.</p></div>
       <div class="step"><div class="n">02</div><h4>Your POS</h4><p>We connect your POS per location and back-fill orders, menu &amp; covers.</p></div>
       <div class="step"><div class="n">03</div><h4>Recipes &amp; menu</h4><p>A short session with your kitchen lead so food-cost is live on day one.</p></div>
       <div class="step"><div class="n">04</div><h4>Bank &amp; delivery</h4><p>Bank feed plus Uber Eats &amp; DoorDash connected for true net revenue.</p></div>
@@ -251,18 +263,18 @@
   <!-- INVESTMENT -->
   <section class="blk">
     <div class="eyebrow">Investment</div>
-    <h2 style="margin-top:8px">One flat price for all six locations</h2>
-    <p class="lead">No per-location charge. The monthly is the same whether you run one location or all six — your growth doesn't get taxed.</p>
+    <h2 style="margin-top:8px">One flat price for all your locations</h2>
+    <p class="lead">No per-location charge. The monthly is the same whether you run one location or many — your growth doesn't get taxed.</p>
     <div class="invest">
       <div class="plan">
-        <span class="tag">CORE MODEL · ALL 6 LOCATIONS</span>
+        <span class="tag">CORE MODEL · ALL LOCATIONS</span>
         <h3>Atelio Restaurant OS</h3>
         <p class="pd">Every module in this proposal, across all of Blaze.</p>
         <div class="bigp"><span class="c">$</span><span class="a">499</span><span class="p">/ month · flat, all locations</span></div>
         <div class="setl" style="margin-top:10px">Includes <b>3 team seats</b> · additional seats <b>+$49</b>/mo each</div>
         <div class="setl" style="margin-top:4px">One-time onboarding <s style="color:var(--muted);font-weight:500">$5,000</s> <b>$2,500</b> <span style="color:var(--green);font-weight:600">· 50% launch offer</span></div>
         <ul class="incl">
-          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>All six Core modules, all six locations</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>All six Core modules, every location</li>
           <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Your POS, bank, delivery, Google &amp; Yelp connections</li>
           <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Automatic updates, new features &amp; support</li>
           <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Blaze branding on the dashboards</li>
@@ -288,18 +300,18 @@
   <!-- ROI -->
   <section class="blk" style="border:none;padding-bottom:0">
     <div class="roi">
-      <div class="eyebrow" style="color:var(--accent)">The math at six locations</div>
+      <div class="eyebrow" style="color:var(--accent)">The math across your locations</div>
       <h2 style="margin-top:10px">Flat pricing is where Blaze wins</h2>
-      <p class="lead">The tools restaurants usually buy charge <em>per location</em>. At six, that adds up fast. Atelio is one flat price — so the more locations you run, the further ahead you are.</p>
+      <p class="lead">The tools restaurants usually buy charge <em>per location</em> — so every location you add raises the bill. Atelio is one flat price that doesn't move, so the more locations you run, the further ahead you are.</p>
       <table class="roitbl">
-        <thead><tr><th>Option</th><th>Pricing model</th><th class="num">Monthly at 6 locations</th><th class="num">Per year</th></tr></thead>
+        <thead><tr><th>Option</th><th>Pricing model</th><th class="num">What you pay</th></tr></thead>
         <tbody>
-          <tr class="us"><td>Atelio Restaurant OS</td><td>$499 flat, all locations</td><td class="num">$499</td><td class="num hl">~$4,990*</td></tr>
-          <tr><td>MarginEdge</td><td>~$330 / location</td><td class="num">~$1,980</td><td class="num">~$23,760</td></tr>
-          <tr><td>Restaurant365</td><td>~$469 / location + setup</td><td class="num">~$2,814</td><td class="num">~$33,768+</td></tr>
+          <tr class="us"><td>Atelio Restaurant OS</td><td>Flat — all locations</td><td class="num hl">$499/mo · ~$4,990/yr*</td></tr>
+          <tr><td>MarginEdge</td><td>~$330 per location</td><td class="num">rises each location</td></tr>
+          <tr><td>Restaurant365</td><td>~$469 per location + setup</td><td class="num">rises each location</td></tr>
         </tbody>
       </table>
-      <div class="foot">*Atelio annual = two months free ($499 × 10). Competitor figures are approximate list prices for a six-location operator, shown for comparison and subject to change. Beyond price, Atelio is a full operations view (delivery reconciliation, reviews, AI-ready) — not only back-office bookkeeping.</div>
+      <div class="foot">*Atelio annual = two months free ($499 × 10). Competitor figures are approximate per-location list prices, shown for comparison and subject to change. Beyond price, Atelio is a full operations view (delivery reconciliation, reviews, AI-ready) — not only back-office bookkeeping.</div>
     </div>
   </section>
 
@@ -308,10 +320,10 @@
     <div class="eyebrow">Timeline</div>
     <h2 style="margin-top:8px">Live in about two weeks</h2>
     <div style="margin-top:22px">
-      <div class="phase"><div class="ph-n">Days 1–3</div><div class="ph-b"><h4>Connect &amp; import</h4><p>We set up all six locations and connect your POS, bank, delivery and review accounts, back-filling recent history.</p></div></div>
+      <div class="phase"><div class="ph-n">Days 1–3</div><div class="ph-b"><h4>Connect &amp; import</h4><p>We set up all your locations and connect your POS, bank, delivery and review accounts, back-filling recent history.</p></div></div>
       <div class="phase"><div class="ph-n">Days 4–8</div><div class="ph-b"><h4>Recipes &amp; food cost</h4><p>A working session with your kitchen lead to bring recipes across, so food-cost is live and accurate.</p></div></div>
       <div class="phase"><div class="ph-n">Days 9–12</div><div class="ph-b"><h4>Verify &amp; train</h4><p>We reconcile every figure against your own records, add your team's seats, and train them on the screens.</p></div></div>
-      <div class="phase"><div class="ph-n">Day ~14</div><div class="ph-b"><h4>Go live</h4><p>Blaze is running on Atelio across all six locations. Your team stops assembling reports and starts using them.</p></div></div>
+      <div class="phase"><div class="ph-n">Day ~14</div><div class="ph-b"><h4>Go live</h4><p>Blaze is running on Atelio across all your locations. Your team stops assembling reports and starts using them.</p></div></div>
     </div>
   </section>
 
@@ -348,7 +360,7 @@
   <div class="wrap">
     <div class="fl">Atelio · Restaurant OS</div>
     <div>Prepared for Blaze Gourmet Burgers by Viviana Ramos · Forma, on the Atelio platform · July 2026</div>
-    <div class="terms">Flat monthly covers all locations under Blaze Gourmet Burgers; includes three team seats, additional seats $49/seat/month. One-time onboarding $5,000, with a 50% launch offer ($2,500), covers full done-for-you setup including your POS connection at no extra charge. 12-month term; annual prepayment earns two months free. Pricing in CAD; USD available. Add-ons optional and billed monthly. Figures for illustration and tailored to a six-location operation.</div>
+    <div class="terms">Flat monthly covers all locations under Blaze Gourmet Burgers; includes three team seats, additional seats $49/seat/month. One-time onboarding $5,000, with a 50% launch offer ($2,500), covers full done-for-you setup including your POS connection at no extra charge. 12-month term; annual prepayment earns two months free. Pricing in CAD; USD available. Add-ons optional and billed monthly. Figures for illustration and tailored to a multi-location operation.</div>
   </div>
 </div>
 
