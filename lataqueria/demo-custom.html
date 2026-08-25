@@ -238,6 +238,22 @@ html[data-div="taq"] .sec-h h3{font-size:20px}
 /* brand-true fills: bars, meters and dots use the real hex, not the darkened text one */
 .bar>span,.meter>span{background:var(--accent-fill,var(--accent))}
 .dvb .dvm{display:flex;flex:none}
+
+/* ---------- person switcher: demonstrates access scoping ---------- */
+.whosw{display:flex;align-items:center;gap:3px;padding-right:12px;margin-right:2px;
+ border-right:1px solid var(--border);flex:none}
+.wb{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;color:var(--ink-muted);
+ border:1px solid transparent;white-space:nowrap;transition:all .12s}
+.wb:hover{color:var(--ink);background:var(--sunken)}
+.wb.on{background:var(--accent);color:#fff}
+
+/* ---------- permission matrix cells ---------- */
+.perm{width:24px;height:24px;border-radius:6px;border:1px solid var(--border-strong);
+ background:var(--surface);color:transparent;font-size:12px;font-weight:700;line-height:1;
+ display:inline-flex;align-items:center;justify-content:center;transition:all .1s}
+.perm:hover{border-color:var(--accent)}
+.perm.on{background:var(--accent-fill,var(--accent));border-color:var(--accent-fill,var(--accent));color:#fff}
+table.dt td:has(.perm){padding:6px 8px}
 /* ---------- module sub-nav ---------- */
 .nv.sub{padding-left:34px;font-size:12.5px;position:relative}
 .nv.sub::before{content:"";position:absolute;left:19px;top:0;bottom:0;width:1px;background:var(--border)}
@@ -452,6 +468,12 @@ html[data-div="taq"] .sec-h h3{font-size:20px}
   /* the fixed top rail already carries the division motif full-width here */
   .brandband{display:none}
 }
+
+@media(max-width:1180px){
+  .whosw{order:-2;width:100%;border-right:0;padding-right:0;margin:0 0 6px;
+    padding-bottom:7px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+  .whosw::-webkit-scrollbar{display:none}
+}
 </style>
 </head>
 <body>
@@ -477,6 +499,7 @@ html[data-div="taq"] .sec-h h3{font-size:20px}
  </aside>
  <main class="main">
   <div class="topbar">
+   <div class="whosw" id="whosw"></div>
    <div class="divsw" id="divsw"></div>
    <div class="vsel" id="vsel"></div>
    <div style="margin-left:auto" class="row">
@@ -545,6 +568,119 @@ const DIVS={
    sw:['#E0714F','#E3B5A4','#FDF4E8']}
 };
 
+
+
+/* ================= NONNA'S OWN DATA =================
+   Nonna's is a separate company on a separate system, so it needs its own
+   suppliers, recipes, courses, catering and stack — not the Mexican group's
+   with the names changed. Grounded in what is verifiable: two rooms (1728
+   Commercial Dr, 2166 E Hastings) plus the truck, dough coming across from the
+   Yukon commissary, a verified Instagram with 23,900 followers, no delivery
+   listing anywhere, and nonnaspopup.com returning a dead Squarespace page. */
+const SUP_NON=[
+ ['Flour — 00 & semola','Both kitchens',2180,+3.4,'Weekly','Doubled since the Drive opened'],
+ ['Tomatoes — San Marzano DOP','Both kitchens',1460,+7.9,'Monthly pallet','Third rise this year'],
+ ['Latticini — fior di latte, burrata','Both kitchens',1980,+2.2,'Twice weekly','Short shelf life, watch waste'],
+ ['Salumi — prosciutto, mortadella, ’nduja','Both kitchens',2340,+5.1,'Weekly','—'],
+ ['Olive oil & pantry','Both kitchens',890,+1.4,'Monthly','—'],
+ ['Coffee — espresso programme','Both rooms',620,+0.0,'Biweekly','Contract to Jan 2027'],
+ ['Dough — Yukon commissary','Commercial Dr',760,null,'Tue & Fri','Inter-company · 30% labour applied']];
+
+const COURSES_NON=[
+ ['FoodSafe Level 1 — refresher','All roles',34,27,'Legal'],
+ ['Serving It Right','FOH · bar',21,18,'Legal'],
+ ['Scrocchiarella — hydration & bake standard','BOH',18,15,'Consistency'],
+ ['Dough handling: commissary delivery to counter','BOH',18,11,'Consistency'],
+ ['Espresso standards & milk texture','FOH',16,9,'Revenue'],
+ ['Allergen handling — gluten, dairy, nuts','All roles',34,24,'Legal'],
+ ['Truck service: setup, pack-out, close','Truck crew',9,7,'Consistency']];
+
+const CATER_NON=[
+ ['Panini platter — office lunch',17,'per person','nnc',9,'Aug'],
+ ['Scrocchiarella pizza party',24,'per person','nnc',6,'Aug'],
+ ['Pasta tray — lasagna al forno',15,'per person','nnc',4,'Aug'],
+ ['Truck booking — half day',1450,'flat','nnp',3,'Aug'],
+ ['Truck booking — full day',2400,'flat','nnp',2,'Aug'],
+ ['Antipasti & arancini grazing',21,'per person','nnc',5,'Aug']];
+
+const POUR_NON=[
+ ['Aperol Spritz',14.00,3.10,142,'—'],['Negroni',15.00,3.40,68,'—'],
+ ['Italian soda — chinotto, aranciata',5.00,1.05,196,'—'],
+ ['Espresso',3.50,0.42,388,'—'],['Affogato',7.50,1.60,104,'—'],
+ ['Amaro — digestivo pour',11.00,2.30,57,'Montenegro'],
+ ['Wine by the glass — rosso',12.00,3.05,163,'—'],
+ ['Wine by the glass — bianco',12.00,2.95,121,'—']];
+
+const STACK_NON=[
+ ['Website','nonnaspopup.com returns a Squarespace “no such website” page','bad','A live site you own, one page per room'],
+ ['Social','Instagram @nonnascucinayvr — verified, 23,900 followers, the entire web presence','warn','Still the strongest channel; give it somewhere to send people'],
+ ['Point of sale','One system across two rooms · the truck rings separately','warn','One ledger, both rooms and the truck'],
+ ['Delivery','No listing on Uber Eats, DoorDash or SkipTheDishes','warn','A decision made on purpose, not by default'],
+ ['Reservations','Walk-in counter · enquiries by DM and email','warn','One book, one guest record'],
+ ['Catering & truck','Bookings tracked in a phone and a notebook','bad','A pipeline with invoices and prep lists'],
+ ['Accounting','QuickBooks · statements uploaded by hand','warn','CSV in, reconciled, exported to the accountant'],
+ ['Commissary link','Dough from Yukon — invoiced across a company boundary','ok','Transfers posted on both sides automatically']];
+
+/* ================= OS INSTANCES =================
+   Two separate operating systems, sold as one group deal. Keeping them apart is
+   a liability decision, not a technical one: a single mistake in a shared view
+   means one owner sees another company's numbers. Cross-group visibility exists
+   only where a person is explicitly given it, on their own dashboard.
+     OS "mx" — La Taquería + La Mezcalería + the Yukon commissary
+     OS "it" — Nonna's Cucina                                            */
+const OSI={
+ mx:{id:'mx', name:'Grupo La Taquería', short:'Mexican group', divs:['taq','mez'],
+     note:'La Taquería, La Mezcalería and the Yukon commissary — one company boundary, one ledger set.'},
+ it:{id:'it', name:'Nonna’s Cucina',   short:'Italian group', divs:['non'],
+     note:'Nonna’s Cucina, its second room and the truck — a separate company, a separate system.'}
+};
+const osOf = divId => divId==='grupo' ? 'mx' : (OSI.mx.divs.includes(divId) ? 'mx' : 'it');
+
+/* People and what each may see. `divs` is operational access inside their own
+   OS; `cross` is the extra combined dashboard they asked for, which may reach
+   across the OS boundary. Anything not listed here is not visible to them. */
+const PEOPLE={
+ marcelo:{id:'marcelo', name:'Marcelo Ramirez Romero', first:'Marcelo', title:'Owner · spans the Mexican group'},
+ alfonso:{id:'alfonso', name:'Alfonso Sanz',           first:'Alfonso', title:'Partner · La Taquería'},
+ nacho:{id:'nacho',     name:'Ignacio Arrieta',        first:'Nacho',   title:'Partner · La Mezcalería'},
+ joe:{id:'joe',         name:'Joe',                    first:'Joe',     title:'Partner · Nonna’s Cucina'}
+};
+
+/* ================= THE GRANT MATRIX =================
+   The single source of truth for who sees what. Everything downstream reads
+   from here — the division switcher, the module nav, the venue chips and the
+   cross-group dashboard. It is editable live in People & access, because these
+   boundaries will move as the group changes and nobody should need us to move
+   them. `mods:null` means every module; otherwise it is an explicit allow-list. */
+function MODIDS_EXCEPT(ex){ return {__except: ex}; }
+const GRANT={
+ marcelo:{divs:['taq','mez'], mods:null},
+ alfonso:{divs:['taq','mez'], mods:null},
+ nacho:{divs:['mez','non'],   mods:null},
+ /* Nonna's runs no commissary and no agave programme, so those two modules are
+    off for Joe by default — an example of the matrix doing real work, not a rule. */
+ joe:{divs:['non'], mods:MODIDS_EXCEPT(['com','bar'])}
+};
+let WHO='marcelo';
+const me = () => Object.assign({}, PEOPLE[WHO], GRANT[WHO]);
+/* Modules this person may open. */
+function myMods(who){
+  const g = GRANT[who||WHO], all = MODS.map(m=>m[0]);
+  if(!g.mods) return all;
+  if(g.mods.__except) return all.filter(id=>!g.mods.__except.includes(id));
+  return all.filter(id=>g.mods.includes(id));
+}
+const canMod = (id,who) => myMods(who).includes(id);
+/* The cross-group screen earns its place once someone holds two divisions. */
+const hasCross = (who) => (GRANT[who||WHO].divs||[]).length > 1;
+/* A person's OS is wherever their divisions sit. Spanning both is legitimate —
+   that is precisely Nacho — and the cross screen is how it is presented. */
+const myOS = (who) => osOf((GRANT[who||WHO].divs||['taq'])[0]);
+const spansOS = (who) => new Set((GRANT[who||WHO].divs||[]).map(osOf)).size > 1;
+const roleLine = (who) => (GRANT[who||WHO].divs||[]).map(d=>DIVS[d].name).join(' + ');
+const crossDivs = (who) => GRANT[who||WHO].divs;
+
+
 let DIV='grupo';
 function divOf(id){return DIVS[id];}
 /* Division marks are colour swatches, not logos. All three brands are typographic —
@@ -593,16 +729,33 @@ function brandHead(){ const d=DIVS[DIV];
    </div></div>`;
 }
 function scopeNote(){ const n=el('scopenote'); if(!n) return;
-  const c=V.filter(inDiv).length;
-  n.innerHTML = (DIV==='grupo' ? 'Bespoke build · 3 divisions · '+c+' venues'
-                               : DIVS[DIV].name+' · '+c+' venues')
-    + '<br>Data illustrative unless tagged <span class="tag ok" style="font-size:9px">verified</span>'; }
-function setDiv(v){ DIV=v; SEL='all'; buildDivSw(); buildVsel(); buildNav(); applyBrand(); scopeNote(); render(); }
+  const c = V.filter(inDiv).length, os = OSI[myOS()];
+  n.innerHTML = `${os.name} · ${DIV==='grupo' ? c+' venues' : DIVS[DIV].name+' · '+c+' venues'}`
+    + `<br><span class="mini">Separate system from ${os.id==='mx' ? OSI.it.name : OSI.mx.name}</span>`
+    + `<br>Data illustrative unless tagged <span class="tag ok" style="font-size:9px">verified</span>`;
+}
+function setDiv(v){ if(v!=='grupo' && !opDivs().includes(v)) return;
+  DIV=v; SEL='all'; buildDivSw(); buildVsel(); buildNav(); applyBrand(); scopeNote(); render(); }
+/* Switching person re-scopes the entire app: which divisions exist, which
+   venues are listed, which modules are offered, and whose day it is. */
+function setWho(w){ WHO=w; const d=opDivs();
+  DIV = d.length>1 ? 'grupo' : d[0];
+  SEL='all';
+  if(MOD==='x' && !hasCross()) MOD='dia';
+  if(!canMod(MOD) && MOD!=='x') MOD = myMods()[0]||'dia';
+  buildWho(); buildDivSw(); buildVsel(); buildNav(); applyBrand(); scopeNote(); render(); }
+function buildWho(){ const n=el('whosw'); if(!n) return;
+  n.innerHTML = `<span class="cap" style="margin-right:6px">Signed in as</span>` + Object.values(PEOPLE).map(p=>
+   `<button class="wb ${WHO===p.id?'on':''}" onclick="setWho('${p.id}')" title="${p.name} — sees ${p.role}">${p.first}</button>`).join('');
+}
 function buildDivSw(){
-  el('divsw').innerHTML = Object.values(DIVS).map(d=>
-   `<button class="dvb ${DIV===d.id?'on':''}" onclick="setDiv('${d.id}')" title="${d.name}">
-     <span class="dvm" style="color:${d.a}">${markSVG(d.id,15)}</span>${d.name}</button>`).join('')
-   + `<span class="divnote mini">${DIVS[DIV].partner} · ${DIVS[DIV].role}</span>`;
+  const d = opDivs(), os = OSI[myOS()];
+  const btn = (id,label,mark) => `<button class="dvb ${DIV===id?'on':''}" onclick="setDiv('${id}')" title="${label}">`
+    + (mark?`<span class="dvm">${markSVG(mark,15)}</span>`:'') + label + `</button>`;
+  let h = d.length>1 ? btn('grupo', os.name, 'grupo') : '';
+  h += d.map(id=>btn(id, DIVS[id].name, id)).join('');
+  h += `<span class="divnote mini">${me().name} · ${roleLine()}</span>`;
+  el('divsw').innerHTML = h;
 }
 
 /* =================== DATA =================== */
@@ -633,7 +786,24 @@ const V = [
   entity:'to map', sales:2140, tgt:1800, covers:88, lab:26.1, food:28.9, open:'by event'}
 ];
 /* venues visible in the current division */
-const inDiv=v=>DIV==='grupo'||v.div===DIV;
+/* 'grupo' is not 'everything' — it is everything this person operates inside
+   their own OS. That distinction is the whole access-control model. */
+const opDivs = () => GRANT[WHO].divs;
+const inDiv = v => DIV==='grupo' ? opDivs().includes(v.div) : v.div===DIV;
+
+/* ---- scoping ----------------------------------------------------------
+   Every module list must be scoped by DIVISION first and venue selection
+   second. Filtering on SEL alone silently leaks another division's rows in
+   whenever "all venues" is selected — which is exactly the data-leakage risk
+   that drove the decision to ship two separate OS instances. Use scoped(). */
+function scoped(arr, key){
+  return arr.filter(r=>{
+    const v = byId(typeof key==='function' ? key(r) : r[key]);
+    return v && inDiv(v) && (SEL==='all' || v.id===SEL);
+  });
+}
+const inDivId = id => { const v=byId(id); return !!v && inDiv(v); };
+
 const byId=i=>V.find(v=>v.id===i);
 let SEL='all';
 const sel=()=> SEL==='all'?V.filter(inDiv):[byId(SEL)];
@@ -969,13 +1139,14 @@ const IC={
  soc:"M18 8a3 3 0 100-6 3 3 0 000 6M6 15a3 3 0 100-6 3 3 0 000 6M18 22a3 3 0 100-6 3 3 0 000 6M8.6 13.5l6.8 3.9M15.4 6.6L8.6 10.5",
  ads:"M3 11v2a1 1 0 001 1h2l5 4V6L6 10H4a1 1 0 00-1 1M16 8.5a5 5 0 010 7M19 5.5a9 9 0 010 13",
  cam:"M8 2v4M16 2v4M3 10h18M3 6a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2zM8 14h3M8 18h6",
- ove:"M3 3v18h18M7 15l3.5-4 3 2.5L20 7"};
+ ove:"M3 3v18h18M7 15l3.5-4 3 2.5L20 7",
+ x:"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"};
 const MODS=[
  ['dia','Your day','dia','A'],['hoy','Hoy · Today','hoy','A',6],['ven','Sales & dayparts','ven','A'],['cos','Food cost & inventory','cos','A'],
  ['com','Commissary & tortillería','com','A'],['bar','Bar & agave cellar','bar','A'],['men','Menu engineering','men','A'],
  ['per','Labour & scheduling','per','B'],['dlv','Delivery platforms','dlv','B'],['res','Reservations & guests','res','B'],
  ['rev','Reviews & reputation','rev','B',2],['mkt','Marketing','mkt','B',9],['cat','Catering & events','cat','B'],
- ['fin','Finance & entities','fin','C'],['pro','Suppliers & purchasing','pro','C'],['bud','Budgets · marketing & AI','bud','C'],['aca','Academy & training','aca','C'],['hrs','People, access & time','hrs','C'],
+ ['fin','Finance & entities','fin','C'],['pro','Suppliers & purchasing','pro','C'],['bud','Budgets · marketing & AI','bud','C'],['aca','Academy & training','aca','C'],['hrs','People & access','hrs','C'],
  ['stk','Systems map','stk','C']];
 /* Modules that carry their own sub-sections. Marketing is the one that matters:
    Google/SEO, social, ads and campaigns are one function, not four products. */
@@ -985,7 +1156,15 @@ const GRP={A:'Operate',B:'Guest & revenue',C:'Back office'};
 let MOD='hoy';
 function buildNav(){
  let h='',last='';
- MODS.forEach(m=>{ if(m[3]!==last){ if(last)h+='</div>'; h+=`<div class="navgrp"><div class="cap">${GRP[m[3]]}</div>`; last=m[3];}
+ /* The cross-group dashboard exists only for people given sight of two groups. */
+ if(hasCross()){
+   h += `<div class="navgrp"><div class="cap">Across your groups</div>`
+     + `<button class="nv ${MOD==='x'?'on':''}" onclick="go('x')">
+         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="${IC.x}"/></svg>
+         <span>Both groups</span></button></div>`;
+ }
+ const allowed = myMods();
+ MODS.filter(m=>allowed.includes(m[0])).forEach(m=>{ if(m[3]!==last){ if(last)h+='</div>'; h+=`<div class="navgrp"><div class="cap">${GRP[m[3]]}</div>`; last=m[3];}
   h+=`<button class="nv ${MOD===m[0]?'on':''}" onclick="go('${m[0]}')">
    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="${IC[m[2]]}"/></svg>
    <span>${m[1]}</span>${m[4]?`<span class="bdg">${m[4]}</span>`:''}</button>`;
@@ -1004,16 +1183,21 @@ function buildVsel(){
   vv.map(v=>`<button class="vchip ${SEL===v.id?'on':''}" onclick="pick('${v.id}')">
    <span class="dot" style="background:${v.c}"></span>${v.brand==='La Taquería'?'La Taquería '+v.site:v.brand}${v.seasonal?' <span style="opacity:.6">·seasonal</span>':''}</button>`).join('');
 }
-function go(m,sb){MOD=m; SUB = sb || (SUBS[m]?SUBS[m][0][0]:SUB); buildNav();render();closeNav();window.scrollTo(0,0);}
+function go(m,sb){ if(m!=='x' && !canMod(m)) return; if(m==='x' && !hasCross()) return;
+ MOD=m; SUB = sb || (SUBS[m]?SUBS[m][0][0]:SUB); buildNav();render();closeNav();window.scrollTo(0,0);}
 function pick(v){SEL=v;buildVsel();render();}
 
 /* =================== MODULES =================== */
 const M={};
+/* Names the current scope safely — SEL may be 'all', in which case byId(SEL)
+   is undefined. Every empty state must survive a whole division having no rows. */
+const scopeName = () => SEL==='all' ? DIVS[DIV].name : byId(SEL).brand;
+
 
 M.hoy=()=>{
  const s=sel(),ns=sum(s,'sales'),tg=sum(s,'tgt'),cv=sum(s,'covers');
  const lb=wavg(s,'lab'),fd=wavg(s,'food');
- const al=SEL==='all'?ALERTS:ALERTS.filter(a=>a.v===SEL);
+ const al=scoped(ALERTS,a=>a.v);
  return pgh('Hoy — Wednesday 12 August 2026',
   SEL==='all'?'Every venue, every channel, one screen. Live from open, closing when the last till does.'
    :`${byId(SEL).brand} · ${byId(SEL).site} — ${byId(SEL).concept}.`)
@@ -1147,7 +1331,7 @@ M.cos=()=>{
   <div class="card pad">${sech('Plate cost against menu price','Live — recalculates when a supplier invoice changes')}
    <div class="scroll"><table class="dt"><thead><tr><th>Item</th><th>Venue</th><th class="num">Menu</th><th class="num">Plate cost</th>
     <th class="num">Cost %</th><th class="num">GP $</th><th class="num">Units/wk</th><th class="num">Weekly GP</th></tr></thead>
-    <tbody>${MENU.filter(m=>SEL==='all'||m[1]===SEL).sort((a,b)=>(b[2]-b[3])*b[4]-(a[2]-a[3])*a[4]).slice(0,16).map(m=>{
+    <tbody>${scoped(MENU,1).sort((a,b)=>(b[2]-b[3])*b[4]-(a[2]-a[3])*a[4]).slice(0,16).map(m=>{
      const cp=m[3]/m[2]*100;
      return `<tr><td><b>${m[0]}</b></td><td class="mini">${vdot(byId(m[1]))} ${MENUV[m[1]]}</td>
       <td class="num mono">${$2(m[2])}</td><td class="num mono">${$2(m[3])}</td>
@@ -1223,7 +1407,7 @@ M.bar=()=>{
   <div class="card pad">${sech('Pour cost by drink','Recipe-level — changes when a bottle price changes')}
    <div class="scroll"><table class="dt"><thead><tr><th>Drink</th><th>Base spirit</th><th class="num">Price</th><th class="num">Pour cost</th>
     <th class="num">Cost %</th><th class="num">Units/wk</th><th class="num">Weekly GP</th></tr></thead>
-    <tbody>${POUR.map(p=>{const cp=p[2]/p[1]*100;return `<tr><td><b>${p[0]}</b></td><td class="mini">${p[4]}</td>
+    <tbody>${(DIV==='non'?POUR_NON:POUR).map(p=>{const cp=p[2]/p[1]*100;return `<tr><td><b>${p[0]}</b></td><td class="mini">${p[4]}</td>
      <td class="num mono">${$2(p[1])}</td><td class="num mono">${$2(p[2])}</td>
      <td class="num mono ${cp>28?'down':cp<20?'up':''}">${pc(cp)}</td><td class="num mono">${p[3]}</td>
      <td class="num mono"><b>${$((p[1]-p[2])*p[3])}</b></td></tr>`}).join('')}</tbody></table></div>
@@ -1231,9 +1415,9 @@ M.bar=()=>{
 };
 
 M.men=()=>{
- const rows=MENU.filter(m=>SEL==='all'||m[1]===SEL).map(m=>({n:m[0],v:m[1],p:m[2],c:m[3],u:m[4],gp:m[2]-m[3],tot:(m[2]-m[3])*m[4]}));
+ const rows=scoped(MENU,1).map(m=>({n:m[0],v:m[1],p:m[2],c:m[3],u:m[4],gp:m[2]-m[3],tot:(m[2]-m[3])*m[4]}));
  if(!rows.length) return pgh('Menu engineering','Four menus, four price ladders, one kitchen network.')
-  +`<div class="card pad">${empty('No costed menu at this venue yet','Menu engineering currently covers Brentwood, Pinche, Comedor and La Mezcalería. '+byId(SEL).brand+' has no plate-level menu mapped — onboarding adds it.')}</div>`;
+  +`<div class="card pad">${empty('No costed menu at this venue yet',scopeName()+' has no plate-level menu mapped yet — onboarding adds it.')}</div>`;
  const medU=[...rows].sort((a,b)=>a.u-b.u)[Math.floor(rows.length/2)].u;
  const medG=[...rows].sort((a,b)=>a.gp-b.gp)[Math.floor(rows.length/2)].gp;
  rows.forEach(r=>r.q=quad(r.u>=medU,r.gp>=medG));
@@ -1256,11 +1440,11 @@ M.men=()=>{
     <text x="228" y="252" text-anchor="middle" font-size="9.5" fill="var(--ink-muted)" font-family="IBM Plex Mono">UNITS PER WEEK →</text>
     <text x="13" y="123" text-anchor="middle" font-size="9.5" fill="var(--ink-muted)" font-family="IBM Plex Mono" transform="rotate(-90 13 123)">GROSS PROFIT PER PLATE →</text>
    </svg>
-   <div style="margin-top:8px">${legend(V.filter(v=>MENUV[v.id]).map(v=>[MENUV[v.id],v.c]))}</div>
+   <div style="margin-top:8px">${legend(V.filter(v=>MENUV[v.id]&&inDiv(v)).map(v=>[MENUV[v.id],v.c]))}</div>
    <p class="mini" style="margin-top:8px">Bubble size = weekly gross profit contributed. Hover for the plate.</p></div>
   <div class="card pad">${sech('Same dish, different price','Across brands — deliberate or drifted?')}
    <div class="scroll"><table class="dt"><thead><tr><th>Item</th><th>Prices</th><th class="num">Spread</th></tr></thead>
-    <tbody>${XPRICE.map(x=>{const ps=x[1].map(p=>p[1]),sp=(Math.max(...ps)/Math.min(...ps)-1)*100;
+    <tbody>${XPRICE.map(x=>[x[0],x[1].filter(p=>inDivId(p[0]))]).filter(x=>x[1].length>1).map(x=>{const ps=x[1].map(p=>p[1]),sp=(Math.max(...ps)/Math.min(...ps)-1)*100;
      return `<tr><td><b>${x[0]}</b></td><td><div class="row wrap" style="gap:5px">
       ${x[1].map(p=>`<span class="tag" style="background:color-mix(in srgb,${byId(p[0]).c} 13%,transparent);color:${byId(p[0]).c}">${MENUV[p[0]]||byId(p[0]).brand} ${$2(p[1])}</span>`).join('')}</div></td>
       <td class="num mono ${sp>40?'down':sp>20?'':''}"><b>${sp<1?'—':'+'+sp.toFixed(0)+'%'}</b></td></tr>`}).join('')}</tbody></table></div>
@@ -1279,7 +1463,7 @@ M.men=()=>{
 };
 
 M.per=()=>{
- const s=sel(),rr=ROLES.filter(r=>SEL==='all'||r[1]===SEL);
+ const s=sel(),rr=scoped(ROLES,1);
  return pgh('Labour & scheduling','Rosters built against forecast covers, not last week&rsquo;s guess — and wages checked against what the market actually pays.')
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Labour cost',pc(wavg(s,'lab')),wavg(s,'lab')-31.0,'vs 31.0% target')}
@@ -1314,9 +1498,9 @@ M.per=()=>{
 };
 
 M.dlv=()=>{
- const d=DLV.filter(x=>SEL==='all'||x[1]===SEL);
+ const d=scoped(DLV,1);
  if(!d.length) return pgh('Delivery platforms','Three platforms, three commission rates.')
-  +`<div class="card pad">${empty('This venue does not deliver',byId(SEL).brand+' has no delivery listing on Uber Eats, DoorDash or SkipTheDishes. That may be deliberate — a walk-in bar and a seasonal patio are not obvious delivery businesses.')}</div>`;
+  +`<div class="card pad">${empty(SEL==='all'?'This group is on no delivery platform':'This venue does not deliver',scopeName()+' has no delivery listing on Uber Eats, DoorDash or SkipTheDishes. That may be deliberate — but it is the one revenue line the other group runs and this one does not, so it is worth deciding on purpose rather than by default.')}</div>`;
  const gross=d.reduce((a,b)=>a+b[2],0),comm=d.reduce((a,b)=>a+b[2]*b[3]/100,0);
  return pgh('Delivery platforms','Three platforms, three commission rates, one of them still arriving as a weekly spreadsheet.')
  +`<div class="grid g4" style="margin-bottom:14px">
@@ -1371,7 +1555,7 @@ M.res=()=>pgh('Reservations & guests','Two booking platforms, a stale listing on
    <div class="card pad">${sech('How each room takes a booking','Today')}
     <div class="scroll"><table class="dt"><thead><tr><th>Venue</th><th>Channel</th><th class="num">Booked</th><th class="num">Covers</th>
      <th class="num">Booked %</th><th>Capability</th></tr></thead>
-     <tbody>${RES.filter(r=>SEL==='all'||r[0]===SEL).map(r=>{const v=byId(r[0]);
+     <tbody>${scoped(RES,0).map(r=>{const v=byId(r[0]);
       return `<tr><td><div class="row" style="gap:7px">${vdot(v)}<b>${v.brand}</b></div></td>
        <td>${r[1]==='None'||r[1]==='Email inbox'?`<span class="tag bad">${r[1]}</span>`:`<span class="tag info">${r[1]}</span>`}</td>
        <td class="num mono">${r[2]||'—'}</td><td class="num mono">${r[3]}</td>
@@ -1394,9 +1578,9 @@ M.res=()=>pgh('Reservations & guests','Two booking platforms, a stale listing on
   </div>`;
 
 M.rev=()=>{
- const r=REV.filter(x=>SEL==='all'||x[0]===SEL);
+ const r=scoped(REV,0);
  if(!r.length) return pgh('Reviews & reputation','Every platform, one inbox.')
-  +`<div class="card pad">${empty('No review profile tracked here yet',byId(SEL).brand+' has no Google, Yelp or Tripadvisor profile we could find. Claiming and connecting it is part of onboarding — a venue with no review presence is one that cannot be found.')}</div>`;
+  +`<div class="card pad">${empty('No review profile tracked here yet',scopeName()+' has no Google, Yelp or Tripadvisor profile we could find. Claiming and connecting it is part of onboarding — a venue with no review presence is one that cannot be found.')}</div>`;
  const tot=r.reduce((a,b)=>a+b[3],0),avg=r.reduce((a,b)=>a+b[2]*b[3],0)/tot,nw=r.reduce((a,b)=>a+b[4],0);
  return pgh('Reviews & reputation','Roughly seven thousand reviews across five platforms, currently read by whoever remembers to look.')
  +`<div class="grid g4" style="margin-bottom:14px">
@@ -1474,7 +1658,7 @@ M.rev=()=>{
 };
 
 M.fin=()=>{
- const f=FIN.filter(x=>SEL==='all'||x[0]===SEL);
+ const f=scoped(FIN,0);
  const T=(i)=>f.reduce((a,b)=>a+b[i],0);
  const ns=T(1),ebitda=ns-T(2)-T(3)-T(4)-T(5)-T(6);
  return pgh('Finance & entities','A consolidated P&amp;L for the group — and a clean set of books for each of the five registered companies underneath it.')
@@ -1540,7 +1724,7 @@ M.cat=()=>pgh('Catering & events','One brand sells catering with published price
   <div class="split" style="margin-bottom:14px">
    <div class="card pad">${sech('Live pipeline','Every enquiry, one board')}
     <div class="scroll"><table class="dt"><thead><tr><th>Enquiry</th><th>Venue</th><th>Package</th><th class="num">Value</th><th>Date</th><th>Stage</th></tr></thead>
-     <tbody>${PIPE.filter(p=>SEL==='all'||p[1]===SEL).map(p=>`<tr><td><b>${p[0]}</b></td>
+     <tbody>${scoped(PIPE,1).map(p=>`<tr><td><b>${p[0]}</b></td>
       <td class="mini">${vdot(byId(p[1]))} ${byId(p[1]).brand}</td><td class="mini">${p[2]}</td>
       <td class="num mono">${$(p[3])}</td><td class="mini">${p[4]}</td>
       <td><span class="tag ${p[5].includes('no reply')?'bad':p[5].includes('Deposit')||p[5]==='Held'?'ok':'info'}">${p[5]}</span></td></tr>`).join('')}
@@ -1549,7 +1733,7 @@ M.cat=()=>pgh('Catering & events','One brand sells catering with published price
      <p class="mini" style="margin:5px 0 0">A $2,450 semi-private booking at Brentwood, unanswered. Your published catering promise is a reply within 24–48 hours. Catering enquiries currently arrive in a shared inbox with no clock on them.</p></div></div>
    <div class="card pad">${sech('Published packages','La Mezcalería · from your catering page')}
     <div class="scroll"><table class="dt"><thead><tr><th>Package</th><th class="num">Price</th><th class="num">Booked · Aug</th></tr></thead>
-     <tbody>${CATER.map(c=>`<tr><td><b>${c[0]}</b><div class="mini">${c[2]}</div></td>
+     <tbody>${scoped(DIV==='non'?CATER_NON:CATER,3).map(c=>`<tr><td><b>${c[0]}</b><div class="mini">${c[2]}</div></td>
       <td class="num mono">${typeof c[1]==='number'?$(c[1]):c[1]}</td><td class="num mono">${c[4]}</td></tr>`).join('')}</tbody></table></div>
     <p class="mini" style="margin-top:10px"><span class="tag ok">verified</span> Prices from lamezcaleria.ca/catering. The two Taco Bar tiers carry the same name at $44 and $59 with no published difference — guests cannot tell what the extra $15 buys, and neither can your own staff.</p>
     <div class="flowbox bad" style="margin-top:12px"><b style="font-size:13px">La Taquería&rsquo;s catering page is invisible</b>
@@ -1575,7 +1759,7 @@ M.aca=()=>pgh('Academy & training','The training module wired to the problems th
    <div class="card pad">${sech('Courses','Completion against assigned')}
     <div class="scroll"><table class="dt"><thead><tr><th>Course</th><th>Audience</th><th class="num">Assigned</th>
      <th class="num">Done</th><th style="width:120px">Progress</th><th>Why</th></tr></thead>
-     <tbody>${COURSES.map(c=>{const p=c[3]/c[2]*100;return `<tr><td><b>${c[0]}</b></td><td class="mini">${c[1]}</td>
+     <tbody>${(DIV==='non'?COURSES_NON:COURSES).map(c=>{const p=c[3]/c[2]*100;return `<tr><td><b>${c[0]}</b></td><td class="mini">${c[1]}</td>
       <td class="num mono">${c[2]}</td><td class="num mono">${c[3]}</td>
       <td><div class="bar"><span style="width:${p.toFixed(0)}%;background:${p>85?'var(--success)':p>50?'var(--accent)':'var(--danger)'}"></span></div></td>
       <td><span class="tag ${c[4]==='Legal'?'bad':c[4]==='Revenue'?'ok':''}">${c[4]}</span></td></tr>`}).join('')}
@@ -1609,8 +1793,8 @@ M.pro=()=>pgh('Suppliers & purchasing','What you buy, what it costs this week ag
    <div class="pad" style="padding-bottom:8px">${sech('Spend by category','Trailing 7 days · group')}</div>
    <div class="scroll"><table class="dt"><thead><tr><th>Category</th><th>Feeds</th><th class="num">Weekly spend</th>
     <th class="num">Price move</th><th>Cadence</th><th>Exposure</th></tr></thead>
-    <tbody>${SUP.map(s=>`<tr><td><b>${s[0]}</b></td><td class="mini">${s[1]}</td><td class="num mono">${$(s[2])}</td>
-     <td class="num mono ${s[3]>5?'down':s[3]<0?'up':''}"><b>${s[3]>0?'+':''}${s[3].toFixed(1)}%</b></td>
+    <tbody>${(DIV==='non'?SUP_NON:SUP).map(s=>`<tr><td><b>${s[0]}</b></td><td class="mini">${s[1]}</td><td class="num mono">${$(s[2])}</td>
+     <td class="num mono ${s[3]===null?'':s[3]>5?'down':s[3]<0?'up':''}"><b>${s[3]===null?'—':(s[3]>0?'+':'')+s[3].toFixed(1)+'%'}</b></td>
      <td class="mini">${s[4]}</td><td class="mini">${s[5]}</td></tr>`).join('')}</tbody></table></div></div>
   <div class="split">
    <div class="card pad">${sech('Menu prices that stopped covering their cost','')}
@@ -1651,13 +1835,13 @@ M.stk=()=>pgh('Systems map','What is actually running the group today — and wh
    <div class="pad" style="padding-bottom:8px">${sech('Today, and after','')}</div>
    <div class="scroll"><table class="dt"><thead><tr><th style="width:16%">Layer</th><th style="width:44%">What runs it now</th>
     <th style="width:8%">State</th><th style="width:32%">After the build</th></tr></thead>
-    <tbody>${STACK.map(s=>`<tr><td><b>${s[0]}</b></td><td class="mini">${s[1]}</td>
+    <tbody>${(DIV==='non'?STACK_NON:STACK).map(s=>`<tr><td><b>${s[0]}</b></td><td class="mini">${s[1]}</td>
      <td><span class="tag ${s[2]}">${s[2]==='bad'?'fragmented':'partial'}</span></td>
      <td class="mini" style="color:var(--ink)">${s[3]}</td></tr>`).join('')}</tbody></table></div></div>
   <div class="split" style="margin-bottom:14px">
    <div class="card pad">${sech('Venue by venue','Integration reality')}
     <div class="scroll"><table class="dt"><thead><tr><th>Venue</th><th>POS</th><th>Ordering</th><th>Reservations</th></tr></thead>
-     <tbody>${V.map(v=>`<tr><td><div class="row" style="gap:7px">${vdot(v)}<b>${v.brand}</b> <span class="muted">${v.site}</span></div></td>
+     <tbody>${V.filter(inDiv).map(v=>`<tr><td><div class="row" style="gap:7px">${vdot(v)}<b>${v.brand}</b> <span class="muted">${v.site}</span></div></td>
       <td>${v.pos==='unmapped'?'<span class="tag bad">unmapped</span>':`<span class="tag info">${v.pos}</span>`}</td>
       <td class="mini mono">${v.ord}</td>
       <td>${v.res==='—'?'<span class="tag bad">none</span>':v.res.includes('email')?`<span class="tag warn">${v.res}</span>`:`<span class="tag">${v.res}</span>`}</td></tr>`).join('')}
@@ -1685,6 +1869,79 @@ M.stk=()=>pgh('Systems map','What is actually running the group today — and wh
   </div>`;
 
 /* =================== GOOGLE & LOCAL PRESENCE =================== */
+
+
+/* Editing the matrix re-scopes the app immediately. A person must always keep at
+   least one group and one module, or they would lock themselves out of a demo
+   with no way back. */
+function tgDiv(who,div){
+  const g=GRANT[who], i=g.divs.indexOf(div);
+  if(i>=0){ if(g.divs.length===1) return; g.divs.splice(i,1); }
+  else g.divs.push(div);
+  if(who===WHO){ const d=opDivs(); if(!d.includes(DIV)&&DIV!=='grupo') DIV=d[0];
+    if(DIV==='grupo'&&d.length===1) DIV=d[0]; }
+  refreshAccess();
+}
+function tgMod(who,mod){
+  const g=GRANT[who], all=MODS.map(m=>m[0]);
+  let cur=myMods(who).slice();
+  const i=cur.indexOf(mod);
+  if(i>=0){ if(cur.length===1) return; cur.splice(i,1); } else cur.push(mod);
+  g.mods = cur.length===all.length ? null : all.filter(id=>cur.includes(id));
+  if(who===WHO && !canMod(MOD) && MOD!=='x') MOD='hrs';
+  refreshAccess();
+}
+function refreshAccess(){ buildWho(); buildDivSw(); buildVsel(); buildNav(); applyBrand(); scopeNote(); render(); }
+
+/* =================== ACROSS YOUR GROUPS ===================
+   Alfonso and Nacho each sit over two groups. This is the only screen that
+   reaches across the OS boundary, and it is deliberately a summary: combined
+   tasks and headline numbers, never another group's operational detail. */
+M.x=()=>{
+ const p=me(); if(!hasCross()) return M.dia();
+ const groups = crossDivs().map(id=>({
+   d: DIVS[id],
+   os: osOf(id),
+   vs: V.filter(v=>v.div===id)
+ }));
+ const money = g => g.vs.reduce((a,v)=>a+v.sales,0);
+ const covers = g => g.vs.reduce((a,v)=>a+v.covers,0);
+ const total = groups.reduce((a,g)=>a+money(g),0);
+ const tasks = crossDivs().flatMap(id => (DAY[id]||[]).slice(0,2).map(t=>({div:id, t})));
+ return pgh('Both groups, one list',
+   `${p.name} — the two groups you sit over, side by side. Combined tasks and headline numbers only; each group&rsquo;s detail stays inside its own system.`)
+ +`<div class="grid g4" style="margin-bottom:16px">
+   ${stat('Yesterday, combined',$(total),null,groups.map(g=>g.d.name).join(' + '))}
+   ${stat('Covers, combined',groups.reduce((a,g)=>a+covers(g),0).toLocaleString(),4.1,'vs last week')}
+   ${stat('Groups you oversee',String(groups.length),null,groups.map(g=>OSI[g.os].short).join(' · '))}
+   ${stat('Needs you today',String(tasks.length),null,'across both')}
+  </div>
+  <div class="grid g2" style="margin-bottom:14px">
+   ${groups.map(g=>`<div class="card pad" style="border-top:3px solid ${g.d.af}">
+     <div class="row between" style="margin-bottom:10px">
+       <div class="row" style="gap:9px">${markSVG(g.d.id,18)}<b style="font-size:15px">${g.d.name}</b></div>
+       <span class="tag">${OSI[g.os].name}</span></div>
+     <div class="kv"><span>Yesterday</span><b class="mono">${$(money(g))}</b></div>
+     <div class="kv"><span>Covers</span><b class="mono">${covers(g).toLocaleString()}</b></div>
+     <div class="kv"><span>Rooms</span><b class="mono">${g.vs.length}</b></div>
+     <div class="kv"><span>Share of your total</span><b class="mono">${(money(g)/total*100).toFixed(0)}%</b></div>
+     <div class="mini" style="margin-top:9px">${g.d.rooms}</div>
+    </div>`).join('')}
+  </div>
+  <div class="card pad" style="margin-bottom:14px">
+   ${sech('Your combined list','Ranked by what it costs to ignore — tagged by group')}
+   ${tasks.map((x,i)=>`<div class="dayrow"><span class="daynum">${i+1}</span>
+     <div style="min-width:0;flex:1">
+       <div class="row" style="gap:7px;margin-bottom:3px">
+         <span class="tag" style="background:color-mix(in srgb,${DIVS[x.div].af} 15%,transparent);color:${DIVS[x.div].a}">${DIVS[x.div].name}</span></div>
+       <b style="font-size:14.5px">${x.t[0]}</b>
+       <p class="mini" style="margin:5px 0 0;line-height:1.5">${x.t[1]}</p></div>
+     <button class="pill" style="flex:none;font-size:11.5px;padding:5px 12px">${x.t[2]}</button></div>`).join('')}
+  </div>
+  <div class="card pad">${sech('Why this screen is a summary','And what it deliberately does not show')}
+   <p class="mini" style="margin:0;max-width:840px">${groups.map(g=>g.d.name).join(' and ')} are separate companies on separate systems. This screen is the one place they meet, and it shows headline numbers and your own tasks — not the other group&rsquo;s recipes, staff records, supplier pricing or ledgers. That boundary is deliberate: it is what stops one owner seeing another&rsquo;s costs, and it is why the two groups run as two systems rather than one with a filter over it.</p></div>`;
+};
+
 /* =================== YOUR DAY =================== */
 const DAY={
  grupo:[['Three divisions reported. Two need you.','La Taquería and Nonna&rsquo;s closed ahead of forecast. La Mezcalería finished 6% under — the Stanley Park patio lost half a day to rain.','View group'],
@@ -2056,42 +2313,53 @@ M.bud=()=>{
 };
 
 /* =================== PEOPLE, ACCESS & TIME =================== */
-M.hrs=()=>pgh('People, access & time','Who can see what, who actually logged in, and how long onboarding really takes.')
+M.hrs=()=>pgh('People & access','Who holds which groups, and which modules they actually see. Change it here and the change takes effect immediately — no ticket to us.')
  +`<div class="grid g4" style="margin-bottom:14px">
-   ${stat('People on the platform','88',null,'across three divisions')}
-   ${stat('Offer to signed','1.4 days',-62.0,'was 3.7')}
-   ${stat('Compliance current',pc(80.7),6.2,'FoodSafe + Serving It Right')}
+   ${stat('People on the platform','88',null,'across both systems')}
+   ${stat('Partners with access','4',null,'each scoped differently')}
+   ${stat('Modules visible to you',String(myMods().length)+' of '+String(MODS.length),null,'as '+me().first)}
    ${stat('Seats unused','1',null,'no login in 9 days')}
   </div>
-  <div class="split" style="margin-bottom:14px">
-   <div class="card pad">${sech('Who sees what','Set per person, per division')}
-    <div class="scroll"><table class="dt"><thead><tr><th>Person</th><th>Role</th><th>Sees</th><th>Cannot see</th></tr></thead>
-     <tbody>${[['Marcelo','Owner · spans two groups','La Taquería + La Mezcalería, group rollup','Nonna&rsquo;s finance'],
-                ['Alfonso','Partner · La Taquería','La Taquería, all modules, its P&amp;L','Other divisions&rsquo; finance'],
-                ['Nacho','Partner · La Mezcalería','La Mezcalería, Chupito, Stanley Park','Other divisions&rsquo; finance'],
-                ['Joe','Partner · Nonna&rsquo;s','Nonna&rsquo;s Cucina + the pop-up','Everything else'],
-                ['GM · per venue','Manager','Their venue: today, roster, reviews, orders','Finance, wages, group data'],
-                ['Chef','Kitchen','Inventory, orders, commissary, recipes','Anything financial'],
-                ['Bookkeeper','Back office','Finance, invoices, reconciliation','Marketing, HR, wages']]
-       .map(r=>`<tr><td><b>${r[0]}</b></td><td class="mini">${r[1]}</td><td class="mini">${r[2]}</td>
-        <td class="mini muted">${r[3]}</td></tr>`).join('')}
-     </tbody></table></div>
-    <p class="mini" style="margin-top:10px">A partner opening the platform lands in their own division and sees nothing they should not. The switcher at the top only offers the divisions that person is entitled to.</p></div>
-   <div class="card pad">${sech('Time in system','Logged automatically · last 7 days')}
-    <div class="scroll"><table class="dt"><thead><tr><th>Person</th><th class="num">Logged in</th><th class="num">Actions</th><th>Mostly</th></tr></thead>
-     <tbody>${[['Bookkeeper',42,318,'Invoice review, reconciliation'],
-                ['GM · Brentwood',186,412,'Roster, reviews, today'],
-                ['Chef · Comedor',94,266,'Inventory, commissary orders'],
-                ['GM · Pinche',71,148,'Today, orders'],
-                ['Marketing contractor',0,0,'No login in 9 days']]
-       .map(r=>`<tr><td><b>${r[0]}</b></td>
-        <td class="num mono ${r[1]===0?'down':''}">${r[1]?r[1]+' min':'—'}</td>
-        <td class="num mono">${r[2]||'—'}</td><td class="mini">${r[3]}</td></tr>`).join('')}
-     </tbody></table></div>
-    <div class="bcard" style="margin-top:12px"><b style="font-size:13.5px">Use this one carefully</b>
-     <p class="mini" style="margin:5px 0 0">It answers a real question — is the contractor billing five hours a week actually in here? But it is a management tool, not a surveillance one, and your team should know it exists. Better that you tell them than that they find out.</p></div>
-   </div>
+
+  <div class="card pad" style="margin-bottom:14px">
+   ${sech('Groups','Which businesses each person may open')}
+   <div class="scroll"><table class="dt"><thead><tr><th>Person</th><th>Role</th>
+     ${Object.values(DIVS).filter(d=>d.id!=='grupo').map(d=>`<th style="text-align:center">${d.name}</th>`).join('')}
+     <th style="text-align:center">Combined view</th></tr></thead>
+    <tbody>${Object.values(PEOPLE).map(pp=>{
+      const g=GRANT[pp.id];
+      return `<tr${pp.id===WHO?' style="background:var(--accent-subtle)"':''}>
+      <td><b>${pp.name}</b>${pp.id===WHO?' <span class="tag acc">you</span>':''}</td>
+      <td class="mini">${pp.title}</td>
+      ${Object.values(DIVS).filter(d=>d.id!=='grupo').map(d=>{
+        const on=g.divs.includes(d.id);
+        return `<td style="text-align:center"><button class="perm ${on?'on':''}" onclick="tgDiv('${pp.id}','${d.id}')"
+          title="${on?'Remove':'Grant'} ${d.name} for ${pp.first}">${on?'✓':''}</button></td>`}).join('')}
+      <td style="text-align:center" class="mini">${g.divs.length>1?'<span class="tag acc">yes</span>':'<span class="muted">—</span>'}</td>
+     </tr>`}).join('')}
+    </tbody></table></div>
+   <p class="mini" style="margin-top:10px">A person holding two groups gets the combined dashboard automatically — headline numbers and one merged task list, never the other group&rsquo;s operational detail. Everyone lands in their own group on login and the switcher only offers what this table grants.</p>
   </div>
+
+  <div class="card pad" style="margin-bottom:14px">
+   ${sech('Modules','Untick anything a person does not need to see')}
+   <div class="scroll"><table class="dt"><thead><tr><th>Module</th>
+     ${Object.values(PEOPLE).map(pp=>`<th style="text-align:center">${pp.first}</th>`).join('')}</tr></thead>
+    <tbody>${MODS.map(m=>`<tr>
+      <td><div class="row" style="gap:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="${IC[m[2]]}"/></svg>
+        <b style="font-weight:500">${m[1]}</b>
+        <span class="mini muted">${GRP[m[3]]}</span></div></td>
+      ${Object.values(PEOPLE).map(pp=>{
+        const on=canMod(m[0],pp.id);
+        return `<td style="text-align:center"><button class="perm ${on?'on':''}" onclick="tgMod('${pp.id}','${m[0]}')"
+          title="${on?'Hide':'Show'} ${m[1]} for ${pp.first}">${on?'✓':''}</button></td>`}).join('')}
+     </tr>`).join('')}
+    </tbody></table></div>
+   <div class="bcard" style="margin-top:12px"><b style="font-size:13.5px">This is the live control, not a picture of one</b>
+    <p class="mini" style="margin:5px 0 0">Tick or untick anything above and switch person at the top of the screen — the navigation, the group switcher and the venue list all change with it. Nonna&rsquo;s runs no commissary and no agave cellar, so those two are off for Joe by default; that is a choice this table makes, not a rule we wrote into the build.</p></div>
+  </div>
+
   <div class="card pad">${sech('Onboarding, in one link','From offer to trained')}
    <div class="grid g4">
     ${[['1 · Add the person','Name, email, phone, venue, role. Thirty seconds.'],
@@ -2108,7 +2376,8 @@ function closeNav(){}
 function clock(){
   el('clock').textContent = 'Wed 12 Aug 2026 · 20:42 PDT · live';
 }
-MOD='dia'; buildNav(); buildVsel(); buildDivSw(); applyBrand(); scopeNote(); clock(); render();
+MOD='dia'; WHO='marcelo'; DIV='grupo';
+buildWho(); buildNav(); buildVsel(); buildDivSw(); applyBrand(); scopeNote(); clock(); render();
 </script>
 </body>
 </html>
