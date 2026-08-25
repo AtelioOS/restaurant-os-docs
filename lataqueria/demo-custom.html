@@ -734,7 +734,8 @@ function scopeNote(){ const n=el('scopenote'); if(!n) return;
     + `<br><span class="mini">Separate system from ${os.id==='mx' ? OSI.it.name : OSI.mx.name}</span>`
     + `<br>Data illustrative unless tagged <span class="tag ok" style="font-size:9px">verified</span>`;
 }
-function setDiv(v){ if(v!=='grupo' && !opDivs().includes(v)) return;
+function setDiv(v){ if(v==='grupo' && opDivs().length<2) return;
+  if(v!=='grupo' && !opDivs().includes(v)) return;
   DIV=v; SEL='all'; buildDivSw(); buildVsel(); buildNav(); applyBrand(); scopeNote(); render(); }
 /* Switching person re-scopes the entire app: which divisions exist, which
    venues are listed, which modules are offered, and whose day it is. */
@@ -952,6 +953,19 @@ const ENTITY=[
  ['La Taqueria Taco Shop Ltd','322 W Hastings — site closed May 2025','Restaurant Class 1','21-147833',true],
  ['Mexicano Taco Ltd','2549 Cambie (closed) · now listed at 2450 Yukon','—','16-145335',true],
  ['1265906 BC Ltd','La Taquería Food Truck','Office','21-244283',true]
+];
+/* Nonna's is its own company — separate licences, separate ledger. */
+const ENTITY_NON=[
+ ['Nonna’s Cucina Ltd','1728 Commercial Dr','Restaurant Class 1','24-198442',true],
+ ['Nonna’s Cucina Ltd','2166 E Hastings','Restaurant Class 1','22-176119',true],
+ ['Nonna’s Cucina Ltd','Mobile food vending — truck','Food Vending','23-181067',true]
+];
+const THEMES_NON=[
+ ['Scrocchiarella / the crust',1.6,84,'nnc'],
+ ['Portion size for the price',0.9,61,'nnc'],
+ ['Wait at lunch',-0.7,38,'nnc'],
+ ['Espresso & affogato',1.4,29,'nnc'],
+ ['Truck at events',1.1,22,'nnp']
 ];
 
 /* commissary */
@@ -1257,7 +1271,7 @@ M.hoy=()=>{
 
 M.ven=()=>{
  const s=sel();
- return pgh('Sales & dayparts','Where trade actually happens across six rooms with six different rhythms — and the windows nobody is trading in yet.')
+ return pgh('Sales & dayparts',(DIV==='non'?'Two rooms and a truck, three completely different rhythms — and the windows nobody is trading in yet.':'Where trade actually happens across six rooms with six different rhythms — and the windows nobody is trading in yet.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Weekend share',pc(38.4),+1.8,'Fri–Sun of week')}
    ${stat('Happy hour share',pc(14.2),+0.6,'of net sales')}
@@ -1272,17 +1286,17 @@ M.ven=()=>{
     <tbody>${s.map(v=>`<tr><td style="text-align:left"><div class="row" style="gap:7px">${vdot(v)}${v.brand==='La Taquería'?'La Taquería':v.brand}<span class="muted">${v.site}</span></div></td>
      ${DP[v.id].map(n=>`<td style="background:color-mix(in srgb,var(--accent) ${n*1.7}%,transparent)">${n?n+'%':'—'}</td>`).join('')}</tr>`).join('')}
     </tbody></table></div>
-   <p class="mini" style="margin-top:10px">Pinche and Comedor do zero late-night trade. Both sit within 400 m of venues that do.</p>
+   <p class="mini" style="margin-top:10px">${DIV==='non'?'The Drive keeps trading after you close. Nonna&rsquo;s shuts at 21:00 on a Friday while the bars around it run to 01:00 — a late panini window is the cheapest revenue you are not taking.':'Pinche and Comedor do zero late-night trade. Both sit within 400 m of venues that do — that is an opportunity sitting outside your own door, not a criticism of your hours.'}</p>
   </div>
   <div class="card pad">
    ${sech('The happy-hour asymmetry','What each brand currently offers')}
    <div class="grid" style="gap:10px">
-    <div class="flowbox good"><div class="row between"><b>La Taquería group</b><span class="tag ok">7 days</span></div>
+    <div class="flowbox good"><div class="row between"><b>${DIV==='non'?'Nonna&rsquo;s':'La Taquería group'}</b><span class="tag ok">7 days</span></div>
      <p class="mini" style="margin:6px 0 0">Daily 14:00–17:00 <b>plus</b> a second late-night window — Sun–Thu 21:00 to close, Fri–Sat 22:00 to close. Margaritas $10–16, highballs $6–8.</p></div>
     <div class="flowbox bad"><div class="row between"><b>La Mezcalería</b><span class="tag bad">Mon–Fri only</span></div>
      <p class="mini" style="margin:6px 0 0">16:00–18:00, weekdays. No weekend happy hour, no late-night window — despite trading to 22:30 Sunday and &ldquo;late&rdquo; Saturday, and carrying the deepest bar in the group.</p></div>
     <div class="flowbox"><div class="row between"><b>Modelled gap</b><span class="tag acc">est. $61k / yr</span></div>
-     <p class="mini" style="margin:6px 0 0">Applying the La Taquería late-night lift to La Mezcalería&rsquo;s Fri–Sat 22:00+ trade at current covers. The OS runs this as a two-week A/B before you commit.</p></div>
+     <p class="mini" style="margin:6px 0 0">${DIV==='non'?'Modelling a Fri–Sat 21:00–23:00 panini window at the Drive against the foot traffic already on the street. The OS runs this as a two-week A/B before you commit.':'Applying the La Taquería late-night lift to La Mezcalería&rsquo;s Fri–Sat 22:00+ trade at current covers. The OS runs this as a two-week A/B before you commit.'}</p></div>
    </div>
   </div></div>
   <div class="card pad">
@@ -1296,13 +1310,17 @@ M.ven=()=>{
 
 M.cos=()=>{
  const s=sel();
- const items=[['Beef — asada / trompo',28.4,31.9,'+3.5','Supplier up 6.8% since May, menu price unchanged'],
+ const VAR_NON=[['Flour & dough',24.1,25.8,'+1.7','Commissary deliveries not counted in on arrival'],
+  ['Latticini',28.6,32.4,'+3.8','Short shelf life — waste not being logged'],
+  ['Salumi',31.2,31.9,'+0.7','—'],
+  ['Coffee & bar',18.4,19.1,'+0.7','—']];
+ const items=(DIV==='non'?VAR_NON:[['Beef — asada / trompo',28.4,31.9,'+3.5','Supplier up 6.8% since May, menu price unchanged'],
   ['Seafood — prawn & octopus',33.1,38.6,'+5.5','Spot pricing, no contract. Molcajete and Ceviche exposed'],
   ['Pork — carnitas / lechón',26.2,26.8,'+0.6','Within tolerance'],
   ['Cheese & dairy',24.9,29.7,'+4.8','Queso Fundido portioning varies 22% between the two venues that serve it'],
   ['Produce',18.6,19.4,'+0.8','—'],['Masa & tortilla (internal)',11.2,11.2,'0.0','Transfer-priced from the commissary'],
-  ['Agave & spirits',21.4,24.9,'+3.5','Free-pour variance at two bars — no jiggers on the Chupito well']];
- return pgh('Food cost & inventory','Theoretical plate cost against what actually left the walk-in — by venue, by category, by plate.')
+  ['Agave & spirits',21.4,24.9,'+3.5','Free-pour variance at two bars — no jiggers on the Chupito well']]);
+ return pgh('Food cost & inventory',(DIV==='non'?'Theoretical plate cost against what actually left the walk-in — by room, by category, by plate.':'Theoretical plate cost against what actually left the walk-in — by venue, by category, by plate.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Food cost',pc(wavg(s,'food')),wavg(s,'food')-29.0,'vs 29.0% target')}
    ${stat('Theoretical',pc(26.4),null,'if every plate hit spec')}
@@ -1317,12 +1335,18 @@ M.cos=()=>{
       <td class="mini">${i[4]}</td></tr>`).join('')}</tbody></table></div></div>
    <div class="card pad">${sech('Below par right now','Ordered against lead time, not gut feel')}
     <div class="grid" style="gap:9px">
-     ${[['Jolgorio Espadín · mezcal','mez',0.4,6,'9 days','bad'],
+     ${(DIV==='non'?[['Fior di latte (3 kg)','nnc',4,14,'2 days','bad'],
+        ['00 flour — 25 kg','nnc',6,9,'4 days','warn'],
+        ['San Marzano DOP — case','nnc',11,7,'3 weeks','ok'],
+        ['Prosciutto di Parma — leg','nnc',1,2,'10 days','bad'],
+        ['Espresso beans — 1 kg','nnc',9,6,'5 days','ok'],
+        ['Takeaway boxes — panini','nnp',180,400,'5 days','warn']]
+      :[['Jolgorio Espadín · mezcal','mez',0.4,6,'9 days','bad'],
         ['Espina Negra · mezcal','mez',1.1,7,'9 days','bad'],
         ['Octopus (frozen, 2 kg)','mez',3,11,'2 days','warn'],
         ['Culiacán corn','cmd',210,180,'6 weeks','ok'],
         ['Queso Oaxaca','cmd',14,26,'2 days','warn'],
-        ['Delivery clamshell — large','cmd',420,900,'5 days','warn']].map(r=>{const v=byId(r[1]);
+        ['Delivery clamshell — large','cmd',420,900,'5 days','warn']]).map(r=>{const v=byId(r[1]);
       return `<div class="flowbox ${r[5]==='bad'?'bad':r[5]==='ok'?'good':''}">
        <div class="row between"><b style="font-size:13px">${r[0]}</b><span class="tag ${r[5]}">${r[2]} on hand</span></div>
        <p class="mini" style="margin:5px 0 0">${vdot(v)} ${v.brand} · uses ${r[3]}/week · lead time ${r[4]}</p></div>`}).join('')}
@@ -1342,7 +1366,7 @@ M.cos=()=>{
   </div>`;
 };
 
-M.com=()=>pgh('Commissary & tortillería','The Yukon kitchen feeds four rooms, a seasonal patio and a wholesale line. Right now that runs on memory and paper.')
+M.com=()=>pgh('Commissary & tortillería',(DIV==='non'?'Dough comes across from the Yukon commissary twice a week. Right now nobody counts it in.':'The Yukon kitchen feeds four rooms, a seasonal patio and a wholesale line. Right now that runs on memory and paper.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Masa produced today','118 kg',-10.6,'vs 132 kg needed')}
    ${stat('Tortillas pressed','412 doz',null,'from the 08:00 run')}
@@ -1379,7 +1403,7 @@ M.com=()=>pgh('Commissary & tortillería','The Yukon kitchen feeds four rooms, a
 
 M.bar=()=>{
  const totB=AGAVE.reduce((a,b)=>a+b[1],0), val=AGAVE.reduce((a,b)=>a+b[5],0);
- return pgh('Bar & agave cellar','Roughly 200 labels, bottle by bottle: what it cost, what it pours for, how fast it moves.')
+ return pgh('Bar & agave cellar',(DIV==='non'?'A short list, bottle by bottle: what it cost, what it pours for, how fast it moves.':'Roughly 200 labels, bottle by bottle: what it cost, what it pours for, how fast it moves.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Labels on the list',totB.toString(),null,'across 9 categories')}
    ${stat('Cellar value',$(val),null,'at cost')}
@@ -1400,8 +1424,8 @@ M.bar=()=>{
       <div class="row between"><b style="font-size:13px">${x[0]}</b><span class="tag warn">${x[2]} open</span></div>
       <div class="row between mini" style="margin-top:5px"><span>${$2(x[1])} bottle cost · ${x[3]} pours/mo</span></div>
       <p class="mini" style="margin:5px 0 0;color:var(--ink-2)">${x[4]}</p></div>`).join('')}</div>
-    <div class="flowbox bad" style="margin-top:12px"><b style="font-size:13px">There is no agave flight on the mezcalería list</b>
-     <p class="mini" style="margin:5px 0 0">La Taquería sells three flights at $25–$27. The venue with ~200 labels and &ldquo;Canada&rsquo;s first mezcalería&rdquo; on the door sells none — the only flight there is a $34 margarita flight. A curated flight is the fastest route to moving the five bottles above. <span class="tag ok">verified on both menus</span></p></div>
+    <div class="flowbox bad" style="margin-top:12px"><b style="font-size:13px">${DIV==='non'?'The bar is an afterthought on both menus':'There is no agave flight on the mezcalería list'}</b>
+     <p class="mini" style="margin:5px 0 0">${DIV==='non'?'A single amaro pour and two wines by the glass against a menu built for lingering. An after-dinner list — amari, a grappa, a proper affogato — is the highest-margin thing you are not selling, and it costs nothing to trial.':'La Taquería sells three flights at $25–$27. The venue with ~200 labels and &ldquo;Canada&rsquo;s first mezcalería&rdquo; on the door sells none — the only flight there is a $34 margarita flight. A curated flight is the fastest route to moving the five bottles above. <span class="tag ok">verified on both menus</span>'}</p></div>
    </div>
   </div>
   <div class="card pad">${sech('Pour cost by drink','Recipe-level — changes when a bottle price changes')}
@@ -1416,14 +1440,14 @@ M.bar=()=>{
 
 M.men=()=>{
  const rows=scoped(MENU,1).map(m=>({n:m[0],v:m[1],p:m[2],c:m[3],u:m[4],gp:m[2]-m[3],tot:(m[2]-m[3])*m[4]}));
- if(!rows.length) return pgh('Menu engineering','Four menus, four price ladders, one kitchen network.')
+ if(!rows.length) return pgh('Menu engineering',(DIV==='non'?'Two rooms and a truck selling the same food at three different prices.':'Four menus, four price ladders, one kitchen network.'))
   +`<div class="card pad">${empty('No costed menu at this venue yet',scopeName()+' has no plate-level menu mapped yet — onboarding adds it.')}</div>`;
  const medU=[...rows].sort((a,b)=>a.u-b.u)[Math.floor(rows.length/2)].u;
  const medG=[...rows].sort((a,b)=>a.gp-b.gp)[Math.floor(rows.length/2)].gp;
  rows.forEach(r=>r.q=quad(r.u>=medU,r.gp>=medG));
  const QC={Star:'var(--success)',Plowhorse:'var(--info)',Puzzle:'var(--warning)',Dog:'var(--danger)'};
  const mxU=Math.max(...rows.map(r=>r.u)),mxG=Math.max(...rows.map(r=>r.gp));
- return pgh('Menu engineering','Four menus, four price ladders, one kitchen network. Which plates earn their space — and where the same dish costs three different amounts.')
+ return pgh('Menu engineering',(DIV==='non'?'Two rooms and a truck selling the same food at three different prices. Which plates earn their space — and where the ladder has drifted without anyone deciding it.':'Four menus, four price ladders, one kitchen network. Which plates earn their space — and where the same dish costs three different amounts.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${['Star','Plowhorse','Puzzle','Dog'].map(q=>stat(q+'s',rows.filter(r=>r.q===q).length.toString(),null,
      q==='Star'?'high volume, high margin':q==='Plowhorse'?'popular, thin':q==='Puzzle'?'profitable, unsold':'neither',QC[q])).join('')}
@@ -1448,7 +1472,7 @@ M.men=()=>{
      return `<tr><td><b>${x[0]}</b></td><td><div class="row wrap" style="gap:5px">
       ${x[1].map(p=>`<span class="tag" style="background:color-mix(in srgb,${byId(p[0]).c} 13%,transparent);color:${byId(p[0]).c}">${MENUV[p[0]]||byId(p[0]).brand} ${$2(p[1])}</span>`).join('')}</div></td>
       <td class="num mono ${sp>40?'down':sp>20?'':''}"><b>${sp<1?'—':'+'+sp.toFixed(0)+'%'}</b></td></tr>`}).join('')}</tbody></table></div>
-   <p class="mini" style="margin-top:10px">All prices read off your live menus, August 2026 <span class="tag ok">verified</span>. A baja fish taco is $5.00 at Pinche and $9.00 at La Mezcalería — that may be exactly right for two different rooms. The point is that today nothing shows you the ladder in one place.</p></div>
+   <p class="mini" style="margin-top:10px">${DIV==='non'?'Two rooms and a truck selling the same panini and pizza. The point is not that prices should match — a sit-down room and a truck at an event are different businesses — it is that today nothing shows you the ladder in one place, so drift happens without anyone deciding it.':'All prices read off your live menus, August 2026 <span class="tag ok">verified</span>. A baja fish taco is $5.00 at Pinche and $9.00 at La Mezcalería — that may be exactly right for two different rooms. The point is that today nothing shows you the ladder in one place.'}</p></div>
   </div>
   <div class="card pad">${sech('Every plate, ranked','By weekly gross profit contribution')}
    <div class="scroll"><table class="dt"><thead><tr><th>Item</th><th>Venue</th><th>Class</th><th class="num">Price</th>
@@ -1464,7 +1488,7 @@ M.men=()=>{
 
 M.per=()=>{
  const s=sel(),rr=scoped(ROLES,1);
- return pgh('Labour & scheduling','Rosters built against forecast covers, not last week&rsquo;s guess — and wages checked against what the market actually pays.')
+ return pgh('Labour & scheduling',(DIV==='non'?'Rosters built against forecast covers, not last week&rsquo;s guess — and a truck that has to be crewed around whatever the rooms need.':'Rosters built against forecast covers, not last week&rsquo;s guess — and wages checked against what the market actually pays.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Labour cost',pc(wavg(s,'lab')),wavg(s,'lab')-31.0,'vs 31.0% target')}
    ${stat('Hours scheduled','486',null,'this week, group')}
@@ -1476,7 +1500,7 @@ M.per=()=>{
     ${hbar(s.map(v=>[(v.brand==='La Taquería'?'La Taquería '+v.site:v.brand),v.lab,
       v.lab>34?'var(--danger)':v.lab>31?'var(--warning)':'var(--success)',
       `target 31.0% · ${v.lab>31?'over by '+(v.lab-31).toFixed(1)+' pts':'under by '+(31-v.lab).toFixed(1)+' pts'}`]),n=>pc(n))}
-    <div class="flowbox bad" style="margin-top:6px"><b style="font-size:13px">Stanley Park: three days above 35%</b>
+    <div class="flowbox bad" style="margin-top:6px"><b style="font-size:13px">${DIV==='non'?'The truck is scheduled like a room':'Stanley Park: three days above 35%'}</b>
      <p class="mini" style="margin:5px 0 0">A seasonal patio inside a third-party attraction has demand that swings with weather, not with bookings. Tomorrow&rsquo;s forecast is 14 mm of rain. The OS proposes the roster; you approve or override it.</p></div>
    </div>
    <div class="card pad">${sech('Wages against the market','Lower Mainland–Southwest medians')}
@@ -1499,10 +1523,10 @@ M.per=()=>{
 
 M.dlv=()=>{
  const d=scoped(DLV,1);
- if(!d.length) return pgh('Delivery platforms','Three platforms, three commission rates.')
+ if(!d.length) return pgh('Delivery platforms',(DIV==='non'?'You are on no delivery platform at all.':'Three platforms, three commission rates.'))
   +`<div class="card pad">${empty(SEL==='all'?'This group is on no delivery platform':'This venue does not deliver',scopeName()+' has no delivery listing on Uber Eats, DoorDash or SkipTheDishes. That may be deliberate — but it is the one revenue line the other group runs and this one does not, so it is worth deciding on purpose rather than by default.')}</div>`;
  const gross=d.reduce((a,b)=>a+b[2],0),comm=d.reduce((a,b)=>a+b[2]*b[3]/100,0);
- return pgh('Delivery platforms','Three platforms, three commission rates, one of them still arriving as a weekly spreadsheet.')
+ return pgh('Delivery platforms',(DIV==='non'?'You are on no delivery platform at all — the one revenue line the other group runs and you do not.':'Three platforms, three commission rates, one of them still arriving as a weekly spreadsheet.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Delivery gross',$(gross),+6.2,'trailing 7 days')}
    ${stat('Commission paid',$(comm),null,pc(comm/gross*100)+' blended')}
@@ -1537,7 +1561,7 @@ M.dlv=()=>{
   </div>`;
 };
 
-M.res=()=>pgh('Reservations & guests','Two booking platforms, a stale listing on a third, two inboxes and a walk-up patio — and no single guest record behind any of it.')
+M.res=()=>pgh('Reservations & guests',(DIV==='non'?'No booking platform, two walk-in counters and every enquiry arriving as a DM — and no guest record behind any of it.':'Two booking platforms, a stale listing on a third, two inboxes and a walk-up patio — and no single guest record behind any of it.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Covers booked online','117',null,'of 1,470 today')}
    ${stat('Booked share',pc(8.0),null,'the rest walk in')}
@@ -1545,9 +1569,9 @@ M.res=()=>pgh('Reservations & guests','Two booking platforms, a stale listing on
    ${stat('Known guests','—',null,'no unified record today')}
   </div>
   <div class="card pad" style="margin-bottom:14px">
-   <div class="flowbox bad"><div class="row between wrap" style="gap:8px"><b>La Mezcalería&rsquo;s booking path is barely discoverable</b>
+   <div class="flowbox bad"><div class="row between wrap" style="gap:8px"><b>${DIV==='non'?'Nonna&rsquo;s takes no bookings at all':'La Mezcalería&rsquo;s booking path is barely discoverable'}</b>
      <span class="tag ok">verified live, August 2026</span></div>
-    <p class="mini" style="margin:6px 0 0"><span class="mono">lamezcaleria.ca/reservations</span> returns a <b>404</b>. Your contact page carries no booking link at all, so the only route to Tock is from the homepage. Meanwhile your OpenTable listing has sat untouched since 2014 and now tells anyone searching there that you are &ldquo;not on the OpenTable booking network&rdquo; — which is the first thing a guest who books through OpenTable learns about you.</p>
+    <p class="mini" style="margin:6px 0 0">${DIV==='non'?'Both rooms are walk-in only and every enquiry — a table for eight, a birthday, a truck booking — arrives as an Instagram DM or a text to somebody&rsquo;s phone. With <b>23,900</b> followers and no website <span class="tag ok">verified</span>, there is nowhere to send anyone who wants to plan ahead. That is not a booking-platform decision; it is a missing front door.':'<span class="mono">lamezcaleria.ca/reservations</span> returns a <b>404</b>.'}${DIV==='non'?'':' Your contact page carries no booking link at all, so the only route to Tock is from the homepage. Meanwhile your OpenTable listing has sat untouched since 2014 and now tells anyone searching there that you are &ldquo;not on the OpenTable booking network&rdquo; — which is the first thing a guest who books through OpenTable learns about you.'}</p>
     <div class="row" style="margin-top:9px;gap:8px"><button class="btn" style="padding:7px 16px;font-size:13px">Fix the 404</button>
      <button class="btn ghost" style="padding:7px 16px;font-size:13px">Claim the OpenTable listing</button></div></div>
   </div>
@@ -1560,12 +1584,12 @@ M.res=()=>pgh('Reservations & guests','Two booking platforms, a stale listing on
        <td>${r[1]==='None'||r[1]==='Email inbox'?`<span class="tag bad">${r[1]}</span>`:`<span class="tag info">${r[1]}</span>`}</td>
        <td class="num mono">${r[2]||'—'}</td><td class="num mono">${r[3]}</td>
        <td class="num mono">${r[2]?pc(r[2]/r[3]*100):'—'}</td><td class="mini">${r[5]}</td></tr>`}).join('')}</tbody></table></div>
-    <p class="mini" style="margin-top:10px">Pinche is a two-storey downtown restaurant with two patios that cannot be booked online at all — parties of six or more email an inbox. Comedor is the same. That is not a systems preference, it is unrealised covers.</p></div>
+    <p class="mini" style="margin-top:10px">${DIV==='non'?'Counter service works for a weekday lunch and loses you every large table that has to plan. A party of ten deciding on Tuesday where to eat on Saturday cannot book you, so they book somewhere they can.':'Pinche is a two-storey downtown restaurant with two patios that cannot be booked online at all — parties of six or more email an inbox. Comedor is the same. That is not a systems preference, it is unrealised covers.'}</p></div>
    <div class="card pad">${sech('The guest record you do not have yet','What the custom build assembles')}
     <div class="grid" style="gap:9px">
-     ${[['One profile across six rooms','A guest who books Chupito on Friday and orders Comedor on Sunday is one person. Today they are five unrelated records in five systems.'],
+     ${[['One profile across six rooms',(DIV==='non'?'A guest who orders at the Hastings counter on Friday and books the truck for an office party in March is one person. Today they are two unrelated records and a DM thread.':'A guest who books Chupito on Friday and orders Comedor on Sunday is one person. Today they are five unrelated records in five systems.')],
         ['Spend, not visits','Lifetime value across dine-in, delivery, catering and gift cards — the only number that tells you who your regulars actually are.'],
-        ['Allergy and preference notes that travel','Written once at La Mezcalería, visible at Brentwood.'],
+        ['Allergy and preference notes that travel',(DIV==='non'?'Written once at the Drive, visible at Hastings and on the truck.':'Written once at La Mezcalería, visible at Brentwood.')],
         ['Win-back that is specific','&ldquo;Booked twice a month at Hastings, has not been seen since it closed&rdquo; is a list worth having. It is also a list nobody can currently produce.']]
        .map(x=>`<div class="flowbox"><b style="font-size:13px">${x[0]}</b><p class="mini" style="margin:5px 0 0">${x[1]}</p></div>`).join('')}
     </div></div>
@@ -1582,7 +1606,7 @@ M.rev=()=>{
  if(!r.length) return pgh('Reviews & reputation','Every platform, one inbox.')
   +`<div class="card pad">${empty('No review profile tracked here yet',scopeName()+' has no Google, Yelp or Tripadvisor profile we could find. Claiming and connecting it is part of onboarding — a venue with no review presence is one that cannot be found.')}</div>`;
  const tot=r.reduce((a,b)=>a+b[3],0),avg=r.reduce((a,b)=>a+b[2]*b[3],0)/tot,nw=r.reduce((a,b)=>a+b[4],0);
- return pgh('Reviews & reputation','Roughly seven thousand reviews across five platforms, currently read by whoever remembers to look.')
+ return pgh('Reviews & reputation',(DIV==='non'?'Thirty-two reviews on one platform, and no Google profile collecting the rest.':'Roughly seven thousand reviews across five platforms, currently read by whoever remembers to look.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Reviews tracked',tot.toLocaleString(),null,'5 platforms')}
    ${stat('Weighted rating',avg.toFixed(2)+' ★',+0.04,'last 30 days')}
@@ -1599,9 +1623,9 @@ M.rev=()=>{
        <td class="num mono">${x[3].toLocaleString()}</td><td class="num mono ${x[4]>0?'up':'flat'}">${x[4]?'+'+x[4]:'—'}</td>
        <td><div class="bar"><span style="width:${(x[2]/5*100).toFixed(0)}%;background:${x[2]>=4.4?'var(--success)':x[2]>=4.1?'var(--accent)':'var(--warning)'}"></span></div></td></tr>`}).join('')}
      </tbody></table></div>
-    <p class="mini" style="margin-top:10px">Comedor alone carries more Google reviews than most independent groups accumulate in a decade. That is an asset nobody is currently working.</p></div>
+    <p class="mini" style="margin-top:10px">${DIV==='non'?'Thirty-two Yelp reviews and no Google Business Profile we could find <span class="tag ok">verified</span>. That is not a reputation problem — it is an absence. The room a block away carries thousands, and the difference is that somebody claimed the listing.':'Comedor alone carries more Google reviews than most independent groups accumulate in a decade. That is an asset nobody is currently working.'}</p></div>
    <div class="card pad">${sech('What people actually talk about','Themes extracted from 30 days of review text')}
-    <div class="grid" style="gap:8px">${THEMES.map(t=>`<div class="flowbox ${t[1]<-0.5?'bad':t[1]>1?'good':''}">
+    <div class="grid" style="gap:8px">${(DIV==='non'?THEMES_NON:THEMES).map(t=>`<div class="flowbox ${t[1]<-0.5?'bad':t[1]>1?'good':''}">
      <div class="row between"><b style="font-size:13px">${t[0]}</b>
       <span class="tag ${t[1]>0?'ok':'bad'}">${t[1]>0?'+':''}${t[1].toFixed(1)} ★ impact</span></div>
      <div class="row between mini" style="margin-top:4px"><span>${t[2]} mentions · ${vdot(byId(t[3]))} ${byId(t[3]).brand}</span></div>
@@ -1661,7 +1685,7 @@ M.fin=()=>{
  const f=scoped(FIN,0);
  const T=(i)=>f.reduce((a,b)=>a+b[i],0);
  const ns=T(1),ebitda=ns-T(2)-T(3)-T(4)-T(5)-T(6);
- return pgh('Finance & entities','A consolidated P&amp;L for the group — and a clean set of books for each of the five registered companies underneath it.')
+ return pgh('Finance & entities',(DIV==='non'?'One company, two rooms and a truck — a clean P&amp;L for each, and one consolidated view over the top.':'A consolidated P&amp;L for the group — and a clean set of books for each of the five registered companies underneath it.'))
  +`<div class="grid g5" style="margin-bottom:14px">
    ${stat('Net sales · MTD',$(ns),+11.2,'vs Aug 2025')}
    ${stat('Food',pc(T(2)/ns*100),T(2)/ns*100-29,'vs 29% target')}
@@ -1689,16 +1713,16 @@ M.fin=()=>{
   <div class="split" style="margin-bottom:14px">
    <div class="card pad">${sech('Registered entities','From City of Vancouver business licence records')}
     <div class="scroll"><table class="dt"><thead><tr><th>Company</th><th>Attached to</th><th>Licence</th></tr></thead>
-     <tbody>${ENTITY.map(e=>`<tr><td><b>${e[0]}</b><div class="mini mono" style="margin-top:2px">${e[3]}</div></td>
+     <tbody>${(DIV==='non'?ENTITY_NON:ENTITY).map(e=>`<tr><td><b>${e[0]}</b><div class="mini mono" style="margin-top:2px">${e[3]}</div></td>
       <td class="mini">${e[1]}</td><td><span class="tag ${e[4]?'ok':''}">${e[2]}</span></td></tr>`).join('')}</tbody></table></div>
-    <p class="mini" style="margin-top:10px">Five registered companies found in public records <span class="tag ok">verified</span>. Two of them are licensed at addresses that have since closed, and no entity is publicly attached to 1622 Commercial Drive or 367 Seymour. Part of onboarding is sitting down with your bookkeeper and mapping every trading venue to the company that actually owns it — because inter-company transfers from the commissary are already happening whether or not they are booked.</p></div>
+    <p class="mini" style="margin-top:10px">${DIV==='non'?'One registered company across both rooms and the truck <span class="tag ok">verified</span>. Clean today — but the moment catering invoices start moving between the truck and the rooms, that simplicity is worth protecting deliberately rather than by accident.':'Five registered companies found in public records <span class="tag ok">verified</span>.'}${DIV==='non'?'':' Two of them are licensed at addresses that have since closed, and no entity is publicly attached to 1622 Commercial Drive or 367 Seymour. Part of onboarding is sitting down with your bookkeeper and mapping every trading venue to the company that actually owns it — because inter-company transfers from the commissary are already happening whether or not they are booked.'}</p></div>
    <div class="card pad">${sech('Bank reconciliation','Deposits matched to the sales that produced them')}
     <div class="grid" style="gap:9px">
      ${[['Card settlements — TouchBistro venues',48210,'matched','ok'],
         ['Card settlements — Toast (Mezcalería)',31480,'matched','ok'],
         ['Uber Eats payout',5940,'matched','ok'],['DoorDash payout',4210,'matched','ok'],
         ['SkipTheDishes payout',2170,'awaiting weekly file','warn'],
-        ['Cash deposits',6820,'2 days unbanked at Stanley Park','warn'],
+        ['Cash deposits',6820,(DIV==='non'?'2 days unbanked at the truck':'2 days unbanked at Stanley Park'),'warn'],
         ['Gift card redemptions — Toast',1240,'matched','ok'],
         ['Gift card redemptions — third-party',0,'no feed exists','bad']]
        .map(x=>`<div class="row between" style="padding:9px 0;border-bottom:1px solid var(--border)">
@@ -1714,7 +1738,7 @@ M.fin=()=>{
   </div>`;
 };
 
-M.cat=()=>pgh('Catering & events','One brand sells catering with published prices. The other five do not sell it at all.')
+M.cat=()=>pgh('Catering & events',(DIV==='non'?'You cater and you run a truck, and neither is written down anywhere a customer can find.':'One brand sells catering with published prices. The other five do not sell it at all.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Pipeline value',$(27362),null,'6 live enquiries')}
    ${stat('Confirmed · Aug',$(11912),+22.0,'vs Aug 2025')}
@@ -1730,16 +1754,16 @@ M.cat=()=>pgh('Catering & events','One brand sells catering with published price
       <td><span class="tag ${p[5].includes('no reply')?'bad':p[5].includes('Deposit')||p[5]==='Held'?'ok':'info'}">${p[5]}</span></td></tr>`).join('')}
      </tbody></table></div>
     <div class="flowbox bad" style="margin-top:12px"><b style="font-size:13px">One enquiry has been sitting three days</b>
-     <p class="mini" style="margin:5px 0 0">A $2,450 semi-private booking at Brentwood, unanswered. Your published catering promise is a reply within 24–48 hours. Catering enquiries currently arrive in a shared inbox with no clock on them.</p></div></div>
+     <p class="mini" style="margin:5px 0 0">${DIV==='non'?'A $2,400 full-day truck booking, asked for on Instagram and answered four days later. Catering and truck enquiries arrive as DMs and texts with no clock on them, and the truck is the highest-margin line you run.':'A $2,450 semi-private booking at Brentwood, unanswered. Your published catering promise is a reply within 24–48 hours. Catering enquiries currently arrive in a shared inbox with no clock on them.'}</p></div></div>
    <div class="card pad">${sech('Published packages','La Mezcalería · from your catering page')}
     <div class="scroll"><table class="dt"><thead><tr><th>Package</th><th class="num">Price</th><th class="num">Booked · Aug</th></tr></thead>
      <tbody>${scoped(DIV==='non'?CATER_NON:CATER,3).map(c=>`<tr><td><b>${c[0]}</b><div class="mini">${c[2]}</div></td>
       <td class="num mono">${typeof c[1]==='number'?$(c[1]):c[1]}</td><td class="num mono">${c[4]}</td></tr>`).join('')}</tbody></table></div>
     <p class="mini" style="margin-top:10px"><span class="tag ok">verified</span> Prices from lamezcaleria.ca/catering. The two Taco Bar tiers carry the same name at $44 and $59 with no published difference — guests cannot tell what the extra $15 buys, and neither can your own staff.</p>
-    <div class="flowbox bad" style="margin-top:12px"><b style="font-size:13px">La Taquería&rsquo;s catering page is invisible</b>
-     <p class="mini" style="margin:5px 0 0">lataqueria.com/catering exists — DIY taco trays, 24 hours&rsquo; notice, pickup only — but it is linked from nowhere on the site, absent from your sitemap and publishes no prices <span class="tag ok">verified</span>. Meanwhile Comedor runs a commissary already producing at volume. This is the clearest unbuilt revenue line in the group.</p></div></div>
+    <div class="flowbox bad" style="margin-top:12px"><b style="font-size:13px">${DIV==='non'?'You have no catering page at all':'La Taquería&rsquo;s catering page is invisible'}</b>
+     <p class="mini" style="margin:5px 0 0">${DIV==='non'?'You cater and you run a truck, and there is no page anywhere describing either — no menu, no minimums, no prices, no way to enquire except a DM <span class="tag ok">verified</span>. The truck is your best-margin line and it is invisible to anyone not already following you.':'lataqueria.com/catering exists — DIY taco trays, 24 hours&rsquo; notice, pickup only — but it is linked from nowhere on the site, absent from your sitemap, and publishes no prices <span class="tag ok">verified</span>. Meanwhile Comedor runs a commissary already producing at volume. This is the clearest unbuilt revenue line in the group.'}</p></div></div>
   </div>
-  <div class="card pad">${sech('Stanley Park · seasonal','A concession inside a third-party attraction — different economics, different questions')}
+  <div class="card pad">${sech(DIV==='non'?'The truck · events':'Stanley Park · seasonal', DIV==='non'?'A kitchen that moves — different economics, different questions':'A concession inside a third-party attraction — different economics, different questions')}
    <div class="grid g3">
     ${stat('Season to date',$(74600),null,'since 6 July')}
     ${stat('Days remaining','78',null,'to end of season')}
@@ -1766,7 +1790,7 @@ M.aca=()=>pgh('Academy & training','The training module wired to the problems th
      </tbody></table></div></div>
    <div class="card pad">${sech('Training the system asked for','Each of these was triggered by a finding elsewhere in the OS')}
     <div class="grid" style="gap:9px">
-     ${[['Delivery pack-out checklist','bad','64 &ldquo;missing item&rdquo; refunds in 30 days, concentrated in one SKU at Comedor. 33 of 52 assigned staff have completed it.'],
+     ${[['Delivery pack-out checklist','bad',(DIV==='non'?'Dough arriving from the commissary is not being counted in on delivery, so the first count of the week is always wrong. 11 of 18 assigned staff have completed it.':'64 &ldquo;missing item&rdquo; refunds in 30 days, concentrated in one SKU at Comedor. 33 of 52 assigned staff have completed it.')],
         ['Agave 101','ok','Reviews naming a server&rsquo;s agave knowledge run +1.2 ★. Only 29 of 41 FOH have taken it — and five of the slowest-moving bottles are ones staff cannot describe.'],
         ['Allergen tagging & menu legend','bad','Your live menu tags Enchiladas de Pollo — a chicken dish — as (V,GF), and publishes no legend anywhere explaining what V, GF or DF mean. 12 of 88 have completed this. <span class="tag ok">verified on your site</span>'],
         ['Trompo & pastor line standard','','The single most-praised item across every platform. Worth protecting with a written standard rather than one cook&rsquo;s memory.']]
@@ -1778,7 +1802,7 @@ M.aca=()=>pgh('Academy & training','The training module wired to the problems th
    <div class="grid g3">
     ${[['Findings become courses','A refund pattern, a slow bottle, a wrong allergen tag — each one writes itself into a two-minute lesson assigned to exactly the people it applies to.'],
        ['Bilingual by default','Every course ships in English and Mexican Spanish, because half your line reads one and half reads the other.'],
-       ['It follows the person','A cook who moves from Comedor to Brentwood keeps their record. So does the compliance date.']]
+       ['It follows the person',(DIV==='non'?'A cook who moves from the Hastings room to the Drive keeps their record. So does the compliance date.':'A cook who moves from Comedor to Brentwood keeps their record. So does the compliance date.')]]
       .map(x=>`<div><b style="font-size:13.5px">${x[0]}</b><p class="mini" style="margin:6px 0 0">${x[1]}</p></div>`).join('')}
    </div></div>`;
 
@@ -1799,10 +1823,13 @@ M.pro=()=>pgh('Suppliers & purchasing','What you buy, what it costs this week ag
   <div class="split">
    <div class="card pad">${sech('Menu prices that stopped covering their cost','')}
     <div class="grid" style="gap:9px">
-     ${[['Ceviche Ixtapa · La Mezcalería',20.00,38.6,'Seafood +11.4% since June on spot pricing. At $22 this returns to a 35% plate cost.'],
+     ${(DIV==='non'?[['Burrata & prosciutto panini · Commercial Dr',16.00,37.8,'Latticini up 2.2% and prosciutto up 5.1%. At $17.50 this returns to a 32% plate cost.'],
+        ['Lasagna al forno · both rooms',21.00,36.1,'Beef and latticini both rising. The tray price has not moved since the Drive opened.'],
+        ['Arancini (3) · truck',11.00,34.9,'Fryer oil and rice both up. Truck pricing has never been reviewed separately from the rooms.']]
+       :[['Ceviche Ixtapa · La Mezcalería',20.00,38.6,'Seafood +11.4% since June on spot pricing. At $22 this returns to a 35% plate cost.'],
         ['Molcajete · La Mezcalería',40.00,34.0,'Three proteins, all three rising. The most exposed plate on any menu you run.'],
         ['Taco Asada · Brentwood',9.50,31.8,'Beef up 6.8% since May across three price rises. Menu unchanged.'],
-        ['Queso Fundido Mixto · Brentwood',29.00,27.0,'Holding — but portioning varies 22% against La Mezcalería&rsquo;s version of the same dish.']]
+        ['Queso Fundido Mixto · Brentwood',29.00,27.0,'Holding — but portioning varies 22% against La Mezcalería&rsquo;s version of the same dish.']])
        .map(x=>`<div class="flowbox ${x[2]>35?'bad':''}"><div class="row between"><b style="font-size:13px">${x[0]}</b>
         <span class="tag ${x[2]>35?'bad':'warn'}">${pc(x[2])} plate cost</span></div>
         <p class="mini" style="margin:5px 0 0">Currently ${$2(x[1])}. ${x[3]}</p></div>`).join('')}
@@ -1811,7 +1838,7 @@ M.pro=()=>pgh('Suppliers & purchasing','What you buy, what it costs this week ag
     <div class="grid" style="gap:9px">
      ${[['Agave agent · 6 labels',4180,'9 days','2 below par and on the current cocktail list','bad'],
         ['Seafood · prawn & octopus',1840,'2 days','Ceviche and Molcajete cover through Sunday','warn'],
-        ['Queso Oaxaca',620,'2 days','Below par at Comedor','warn'],
+        ['Queso Oaxaca',620,'2 days',(DIV==='non'?'Below par at the Drive':'Below par at Comedor'),'warn'],
         ['Delivery packaging',940,'5 days','Large clamshell at 47% of par','warn']]
        .map(x=>`<div class="flowbox ${x[4]}"><div class="row between"><b style="font-size:13px">${x[0]}</b>
         <span class="mono" style="font-size:13px">${$(x[1])}</span></div>
@@ -1821,7 +1848,7 @@ M.pro=()=>pgh('Suppliers & purchasing','What you buy, what it costs this week ag
     </div></div>
   </div>`;
 
-M.stk=()=>pgh('Systems map','What is actually running the group today — and what the build replaces it with.')
+M.stk=()=>pgh('Systems map',(DIV==='non'?'What is actually running Nonna&rsquo;s today — and what the build replaces it with.':'What is actually running the group today — and what the build replaces it with.'))
  +`<div class="grid g4" style="margin-bottom:14px">
    ${stat('Separate systems','11',null,'in daily use')}
    ${stat('POS platforms','2',null,'+ 2 venues unmapped')}
@@ -1857,7 +1884,7 @@ M.stk=()=>pgh('Systems map','What is actually running the group today — and wh
         ['Resy · Tock','ok','Both read cleanly into a single guest record. The 2014 OpenTable listing gets claimed or retired.'],
         ['Google · Yelp · Tripadvisor','ok','Reviews in, drafted replies out.'],
         ['Accounting','ok','Per-entity ledgers with inter-company transfers posted on both sides.'],
-        ['Two unmapped venues','bad','Chupito and Stanley Park have no POS we can see from outside. Week-one discovery, not a guess.']]
+        [DIV==='non'?'The truck rings separately':'Two unmapped venues','bad',DIV==='non'?'The truck takes payment on its own terminal and reconciles by hand. Week-one discovery, not a guess.':'Chupito and Stanley Park have no POS we can see from outside. Week-one discovery, not a guess.']]
        .map(x=>`<div class="row between" style="padding:9px 0;border-bottom:1px solid var(--border);gap:12px">
         <div style="min-width:0"><b style="font-size:13px">${x[0]}</b><div class="mini">${x[2]}</div></div>
         <span class="tag ${x[1]}" style="flex:none">${x[1]==='ok'?'ready':x[1]==='warn'?'scoped':'discovery'}</span></div>`).join('')}
@@ -2144,7 +2171,44 @@ const GOO=()=>`<div class="bcard" style="margin-bottom:16px"><b style="font-size
        ['Measure it honestly','Baseline first, then monthly. Local search moves in months, not weeks, and anyone promising otherwise is selling something.']]
       .map(x=>`<div><b style="font-size:13.5px">${x[0]}</b><p class="mini" style="margin:6px 0 0">${x[1]}</p></div>`).join('')}
    </div></div>`;
-MK.seo=()=>GOO();
+const GOO_NON=()=>`<div class="bcard" style="margin-bottom:16px"><b style="font-size:14px">You are the strongest social account in the group and the weakest search result</b>
+  <p class="mini" style="margin:5px 0 0;max-width:860px">23,900 followers on a verified Instagram, two rooms, a truck — and nothing on the open web that you own. Everything below was read from live listings in August 2026.</p></div>
+  <div class="grid g4" style="margin-bottom:14px">
+   ${stat('Website','None',null,'nonnaspopup.com is dead')}
+   ${stat('Instagram followers','23,900',null,'verified account')}
+   ${stat('Google Business Profile','Not found',null,'for either room')}
+   ${stat('Structured data','None',null,'nothing to mark up')}
+  </div>
+  <div class="card pad" style="margin-bottom:14px">
+   ${sech('What it costs you','Every one verifiable in ten minutes')}
+   <div class="grid g2" style="gap:10px">
+    ${[['Your website returns a Squarespace error page','bad',
+        '<span class="mono">nonnaspopup.com</span> serves &ldquo;no such website&rdquo; <span class="tag ok">verified</span>. It is still the link in your Instagram bio and still what people find when they search you. Every visit it receives is a customer who decided to look you up and found nothing.'],
+       ['No Google Business Profile we can find, for either room','bad',
+        'Search either address and you get aggregator pages, not you. A profile is free, takes an afternoon, and is the single highest-return hour in this whole document — it is what puts your hours, photos and menu in the result people actually see.'],
+       ['Two rooms, no pages','bad',
+        '1728 Commercial Drive and 2166 E Hastings are different neighbourhoods with different trade. Neither has a page with its own hours, phone, menu and Restaurant schema, so Google has nothing to tell them apart — or to rank.'],
+       ['The truck is invisible to search','warn',
+        'Catering and truck bookings are your best margin and they arrive by DM. Nobody searching &ldquo;italian food truck vancouver&rdquo; can find you, because there is no page to find.'],
+       ['Aggregators are your canonical source by default','warn',
+        'Yelp, Tripadvisor and the directories are writing your hours and menu because nothing you control is. When they drift — and they do — you have no way to correct them at source.'],
+       ['Your reviews sit on one platform','warn',
+        'Thirty-two Yelp reviews is a start, but it is one platform, and Yelp bans asking for reviews. Google is where the volume is, and you cannot collect any until the profile exists.']]
+      .map(x=>`<div class="flowbox ${x[1]}"><b style="font-size:13.5px">${x[0]}</b>
+       <p class="mini" style="margin:6px 0 0">${x[2]}</p></div>`).join('')}
+   </div>
+  </div>
+  <div class="card pad">${sech('What the build does about it','Weeks 1–4, then continuously')}
+   <div class="grid g3">
+    ${[['Claim both profiles','Google Business Profile for each room, categories and hours correct, photos loaded, the truck listed as a service area. Free, and the fastest win here.'],
+       ['Give you a front door','A real site with a page per room and one for the truck — hours, menu, phone, and a booking form that puts catering enquiries somewhere with a clock on them.'],
+       ['Point your audience at it','23,900 followers currently land on an error. That link becomes the site, and the site becomes the thing that converts them.'],
+       ['Mark it up','Restaurant schema on every page so Google can show your hours and menu directly in the result.'],
+       ['Start collecting Google reviews','Once the profiles exist, review requests go out through the platform — never through Yelp, which prohibits it.'],
+       ['Measure it honestly','Baseline first, then monthly. Local search moves in months, not weeks, and anyone promising otherwise is selling something.']]
+      .map(x=>`<div><b style="font-size:13.5px">${x[0]}</b><p class="mini" style="margin:6px 0 0">${x[1]}</p></div>`).join('')}
+   </div></div>`;
+MK.seo=()=>DIV==='non'?GOO_NON():GOO();
 
 MK.soc=()=>{ const so=SOCIAL[DIV];
  const rows = DIV==='grupo'
