@@ -120,6 +120,16 @@ hr.rule{border:0;border-top:1px solid var(--border);margin:26px 0}
 .langsw span{padding:4px 9px;color:var(--ink-muted);transition:background .12s,color .12s;display:block}
 .langsw span.on{background:var(--ink);color:var(--canvas)}
 .langsw:hover{border-color:var(--accent)}
+/* ---- charts ---- */
+.chartwrap{width:100%}
+.chartwrap svg text{font-variant-numeric:tabular-nums}
+.chartwrap .legend{margin-top:10px}
+/* checklists in the proposal */
+ul.chk{list-style:none;margin:0;padding:0}
+ul.chk li{position:relative;padding:6px 0 6px 24px;font-size:13.5px;line-height:1.5;border-bottom:1px solid var(--border)}
+ul.chk li:last-child{border-bottom:0}
+ul.chk li::before{content:"";position:absolute;left:2px;top:12px;width:11px;height:11px;border-radius:3px;
+  border:1.5px solid var(--border-strong)}
 
 .wrapl{max-width:900px;margin:0 auto;padding:0 26px 90px}
 .top{border-bottom:1px solid var(--border);margin-bottom:64px}

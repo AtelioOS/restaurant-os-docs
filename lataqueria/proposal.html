@@ -119,6 +119,16 @@ hr.rule{border:0;border-top:1px solid var(--border);margin:26px 0}
 .langsw span{padding:4px 9px;color:var(--ink-muted);transition:background .12s,color .12s;display:block}
 .langsw span.on{background:var(--ink);color:var(--canvas)}
 .langsw:hover{border-color:var(--accent)}
+/* ---- charts ---- */
+.chartwrap{width:100%}
+.chartwrap svg text{font-variant-numeric:tabular-nums}
+.chartwrap .legend{margin-top:10px}
+/* checklists in the proposal */
+ul.chk{list-style:none;margin:0;padding:0}
+ul.chk li{position:relative;padding:6px 0 6px 24px;font-size:13.5px;line-height:1.5;border-bottom:1px solid var(--border)}
+ul.chk li:last-child{border-bottom:0}
+ul.chk li::before{content:"";position:absolute;left:2px;top:12px;width:11px;height:11px;border-radius:3px;
+  border:1.5px solid var(--border-strong)}
 
 body{font-size:15px}
 .wrapp{max-width:920px;margin:0 auto;padding:0 26px 90px}
@@ -390,7 +400,7 @@ ul.cl li.no{color:var(--ink-muted)}
 
 <div class="toc" style="margin-top:52px">
  <a href="#found">What we found</a><a href="#shape">The shape of it</a><a href="#google">Google &amp; local presence</a>
- <a href="#tiers">The build &amp; what it costs</a><a href="#rec">Where we would start</a>
+ <a href="#apis">Integrations &amp; what we need</a><a href="#tiers">The build &amp; what it costs</a><a href="#rec">Where we would start</a>
  <a href="#roi">What it should return</a><a href="#risk">What could go wrong</a><a href="#open">Open questions</a><a href="#next">Next step</a>
 </div>
 
@@ -468,8 +478,94 @@ ul.cl li.no{color:var(--ink-muted)}
 <p>None of that requires an SEO retainer or a rewrite. It requires claiming six profiles properly, giving each venue a page of its own, marking the closed ones closed, and linking the three sites together. <b>Demo 1 has a Marketing module</b> — Google &amp; SEO, social, ads and campaigns under one roof — that lays out the whole picture and tracks it after launch.</p>
 </section>
 
+
+<section id="apis">
+<span class="secnum">04 — Connecting what you already run</span>
+<h2 class="sh">We do the integration work. Here is exactly what it involves.</h2>
+<p class="big" style="max-width:660px">You are not replacing your tills, your accounting or your delivery apps. The build reads from them, so the first question is always the same: what can be connected properly, what has to be imported, and what genuinely cannot be automated.</p>
+
+<p>We have built every one of these before. The honest version, system by system:</p>
+
+<div class="grid g2" style="gap:12px;margin:26px 0">
+ <div class="flowbox good"><b>Toast — live API</b>
+  <p class="mini" style="margin:6px 0 0">La Mezcalería. Sales, payments, menu, labour, same day. This is the connection everything else is measured against. <b>What we need:</b> an owner to approve API access in Toast&rsquo;s partner settings.</p></div>
+ <div class="flowbox good"><b>Uber Eats &amp; DoorDash — live API</b>
+  <p class="mini" style="margin:6px 0 0">Orders, commission, refunds, promo spend, per venue. <b>What we need:</b> store IDs and an admin who can authorise the connection.</p></div>
+ <div class="flowbox warn"><b>TouchBistro — scheduled reports</b>
+  <p class="mini" style="margin:6px 0 0">Three venues. TouchBistro publishes no developer portal or public API reference, and their terms prohibit automated scraping. The supported route is Scheduled Reports emailed as CSV/XLSX about two hours after service close — so those three venues land <b>next day</b>, not same day. <b>What we need:</b> a report schedule configured to a mailbox we agree on.</p></div>
+ <div class="flowbox warn"><b>SkipTheDishes — weekly CSV</b>
+  <p class="mini" style="margin:6px 0 0">No API, and there is not going to be one. Weekly export, imported. <b>What we need:</b> portal login or a standing weekly export.</p></div>
+ <div class="flowbox good"><b>Google Business Profile — live API</b>
+  <p class="mini" style="margin:6px 0 0">Reviews, replies, hours, photos, insights per venue. <b>What we need:</b> owner-level access on each profile, and the two closed Tripadvisor listings released.</p></div>
+ <div class="flowbox good"><b>Resy &amp; Tock — live</b>
+  <p class="mini" style="margin:6px 0 0">Covers, guest records, no-shows into one book. <b>What we need:</b> admin on each, plus a decision on the dead 2014 OpenTable listing.</p></div>
+ <div class="flowbox warn"><b>QuickBooks Desktop — file-based</b>
+  <p class="mini" style="margin:6px 0 0">Desktop has no cloud API. We export and reconcile against it rather than writing into it. If you move to QuickBooks Online at some point, that becomes a live two-way connection. <b>What we need:</b> a chart of accounts and read access for your bookkeeper.</p></div>
+ <div class="flowbox bad"><b>Banking — CSV only, deliberately</b>
+  <p class="mini" style="margin:6px 0 0">We do not connect to your bank. No credentials, no aggregator, no standing access to your money. You export statements; the system reconciles them. This is a security decision and we are not flexible on it. <b>What we need:</b> nothing but the export.</p></div>
+</div>
+
+<div class="quote" style="margin:30px 0">Every integration above is either live, scheduled, or explicitly manual. Nothing in this document depends on a connection we have not already built or verified we can build.</div>
+
+<h3 class="ss">What we need from you before day one</h3>
+<p>This is the part that decides whether week one is spent building or waiting. None of it is difficult, but gathering it takes a few days, so it is worth starting before we do.</p>
+
+<div class="grid g2" style="gap:12px;margin:22px 0">
+ <div>
+  <div class="cap" style="margin-bottom:9px">Access — the long pole</div>
+  <ul class="chk">
+   <li>Owner-level Google Business Profile access, all venues</li>
+   <li>Toast admin (La Mezcalería)</li>
+   <li>TouchBistro admin on all three venues, to set report schedules</li>
+   <li>Uber Eats and DoorDash merchant admin</li>
+   <li>SkipTheDishes partner portal</li>
+   <li>Resy and Tock admin</li>
+   <li>Domain/DNS access for the three websites</li>
+   <li>Meta Business and Instagram for the three brands</li>
+  </ul>
+ </div>
+ <div>
+  <div class="cap" style="margin-bottom:9px">Documents &amp; data</div>
+  <ul class="chk">
+   <li>Current menus with prices, every venue and every platform</li>
+   <li>Recipes or spec sheets for as many plates as exist — even partial</li>
+   <li>Last three months of supplier invoices</li>
+   <li>Supplier list with contacts, order days and lead times</li>
+   <li>Chart of accounts and the last completed year-end</li>
+   <li>Staff list with roles, venues, wages and certification dates</li>
+   <li>Commissary production records, however informal</li>
+   <li>The catering package list and anything already quoted</li>
+  </ul>
+ </div>
+</div>
+
+<div class="grid g2" style="gap:12px;margin:22px 0">
+ <div>
+  <div class="cap" style="margin-bottom:9px">Decisions only you can make</div>
+  <ul class="chk">
+   <li>Which entity owns which trading venue — your bookkeeper will know, and today the public record does not</li>
+   <li>Who sees what: the access matrix in the demo, confirmed</li>
+   <li>Whether Chupito and the Stanley Park patio are inside the group legally</li>
+   <li>The commissary transfer price and the labour surcharge that goes with it</li>
+   <li>Which venue goes first</li>
+  </ul>
+ </div>
+ <div>
+  <div class="cap" style="margin-bottom:9px">People</div>
+  <ul class="chk">
+   <li>One person per group who can answer questions quickly — not a committee</li>
+   <li>Your bookkeeper, for two hours in week one</li>
+   <li>Whoever currently orders, for one hour per kitchen</li>
+   <li>A GM who will use it daily and tell us when it is wrong</li>
+  </ul>
+ </div>
+</div>
+
+<p class="mini" style="max-width:700px">We will send this as a checklist with a shared folder to drop things into. If something on it does not exist — and some of it will not — say so rather than making it up. A gap we know about is a week-one task; a gap we discover in week three is a delay.</p>
+</section>
+
 <section id="tiers">
-<span class="secnum">04 — The build</span>
+<span class="secnum">05 — The build</span>
 <h2 class="sh">Three divisions, one repository, one bill</h2>
 <p>The demo is built the way the system would be: a single platform with three divisions inside it. Switch division at the top and the whole interface re-skins — name, colour, venues, data, budgets. Same modules everywhere, so nobody is learning a different tool from their partners.</p>
 
@@ -542,7 +638,7 @@ ul.cl li.no{color:var(--ink-muted)}
 <p class="mini">Twenty modules, live in stages over roughly sixteen weeks, with the first division reporting inside six.</p>
 </section>
 <section id="rec">
-<span class="secnum">05 — Where we would start</span>
+<span class="secnum">06 — Where we would start</span>
 <h2 class="sh">La Taquería first, then the other two behind it</h2>
 <p>All three divisions get built. The question is only which one goes live first, and it should be <b>La Taquería</b> — because the commissary sits inside it, and the commissary is the piece the other two both depend on. Once Yukon is producing against real orders with inter-company invoices generating on approval, adding La Mezcalería and Nonna&rsquo;s to that spine is configuration rather than construction.</p>
 <div class="quote">Six weeks to the first division reporting. Sixteen to all three, in stages you can see.</div>
@@ -551,7 +647,7 @@ ul.cl li.no{color:var(--ink-muted)}
 </section>
 
 <section id="roi">
-<span class="secnum">06 — What it should return</span>
+<span class="secnum">07 — What it should return</span>
 <h2 class="sh">A floor and a ceiling, and we would rather be held to the floor</h2>
 <p>We do not have your books, so everything here is modelled from what is public plus normal industry ranges. Rather than give you one optimistic number, each line has a <b>conservative floor</b> — what we would expect even if things go slowly — and a <b>realistic ceiling</b>. Treat the floor as the case for doing this and the ceiling as upside.</p>
 <div class="card" style="margin:24px 0"><div class="scroll"><table class="dt">
@@ -571,7 +667,7 @@ ul.cl li.no{color:var(--ink-muted)}
 </section>
 
 <section id="touchbistro">
-<span class="secnum">07 — You asked about TouchBistro</span>
+<span class="secnum">08 — You asked about TouchBistro</span>
 <h2 class="sh">Yes, we can work with it. Not through an API on day one.</h2>
 <p>You asked whether we are compatible with TouchBistro and whether we can use their integration point. Here is the straight answer, because it shapes the timeline more than anything else in this proposal.</p>
 <div class="grid g2" style="gap:12px;margin:24px 0">
@@ -588,7 +684,7 @@ ul.cl li.no{color:var(--ink-muted)}
 </section>
 
 <section id="risk">
-<span class="secnum">08 — What could go wrong</span>
+<span class="secnum">09 — What could go wrong</span>
 <h2 class="sh">Three more things we would rather say now</h2>
 <div class="grid g3" style="gap:14px;margin:24px 0">
  <div class="flowbox warn"><b style="font-size:14.5px">SkipTheDishes has no public API either</b>
@@ -611,7 +707,7 @@ ul.cl li.no{color:var(--ink-muted)}
 </section>
 
 <section id="open">
-<span class="secnum">09 — Open questions</span>
+<span class="secnum">10 — Open questions</span>
 <h2 class="sh">Things we could not settle from outside</h2>
 <p>Not blockers — but each changes scope, so we would rather ask than assume.</p>
 <ul class="cl" style="margin-top:18px">
@@ -631,7 +727,7 @@ ul.cl li.no{color:var(--ink-muted)}
 </section>
 
 <section id="next">
-<span class="secnum">10 — Next step</span>
+<span class="secnum">11 — Next step</span>
 <h2 class="sh">Ninety minutes, and you will know</h2>
 <p>Open both demos before we meet. They are self-contained files — nothing to install, nothing to log into, and there is an English / Spanish switch in the top corner of every page. Click through Demo 1 in particular; the commissary, the agave cellar and the Google module are where the argument actually lives.</p>
 <p>Then give us ninety minutes with whoever owns the numbers. We would walk the demos at your pace, replace our modelled figures with three or four of your real ones on the spot, settle the open questions above, and agree which three locations go first. If at the end of that it does not look worth doing, we would rather hear it then than three weeks in.</p>
