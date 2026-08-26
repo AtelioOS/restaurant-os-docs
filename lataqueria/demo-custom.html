@@ -634,6 +634,39 @@ const DIVS={
 
 
 
+
+/* Drink specs. Pour cost only means something if the spec is written down —
+   a free-poured margarita and a jiggered one are different drinks and
+   different margins. Costs are per serve at current bottle prices. */
+const DRINK={
+ 'Top-Shelf Mezcal Margarita':{v:'mez',glass:'Rocks, salt half-rim',price:19.00,
+   ing:[['Espina Negra mezcal','2 oz',3.24],['Cointreau','0.5 oz',0.86],
+        ['Lime juice, fresh','1 oz',0.42],['Agave syrup','0.25 oz',0.18],['Sal de gusano rim','—',0.62]],
+   note:'The mezcal is 61% of the pour. Free-pouring this by a quarter ounce costs 40 cents a drink.'},
+ 'Margarita (house)':{v:'mez',glass:'Rocks, salt rim',price:15.00,
+   ing:[['Espolòn Blanco tequila','2 oz',1.72],['Triple sec','0.5 oz',0.44],
+        ['Lime juice, fresh','1 oz',0.42],['Agave syrup','0.25 oz',0.18],['Salt rim','—',0.09]],
+   note:'Your volume drink at 19% pour cost. This is the one to protect the spec on.'},
+ 'Margarita Flight':{v:'mez',glass:'3 × 2 oz',price:34.00,
+   ing:[['Three tequilas, 2 oz each','6 oz',5.16],['Mix, shared','—',1.24],['Garnish & salt','—',0.38]],
+   note:'The only flight on any list in the group, and it sells 41 a week. There is no agave flight — which is the gap.'},
+ 'Paloma':{v:'mez',glass:'Highball',price:15.00,
+   ing:[['Espolòn Blanco tequila','2 oz',1.72],['Grapefruit soda','4 oz',0.58],
+        ['Lime juice','0.5 oz',0.21],['Salt rim','—',0.09]],
+   note:'Lowest pour cost on the list at 17%. Under-sold against the margarita.'},
+ 'Agave flight — proposed':{v:'mez',glass:'3 × 1 oz',price:27.00,
+   ing:[['Espadín, 1 oz','1 oz',1.53],['Tepeztate, 1 oz','1 oz',4.73],['Sotol or raicilla, 1 oz','1 oz',2.93]],
+   note:'Not on the list yet. Roughly 34% pour cost — but it moves the slow bottles, and five have been open more than four months.'},
+ 'Aperol Spritz':{v:'nnc',glass:'Wine glass, ice',price:14.00,
+   ing:[['Aperol','2 oz',1.85],['Prosecco','3 oz',1.06],['Soda','1 oz',0.09],['Orange slice','—',0.10]],
+   note:'22% pour cost and it sells 142 a week. The single best margin on either menu.'},
+ 'Negroni':{v:'nnc',glass:'Rocks, big cube',price:15.00,
+   ing:[['Gin','1 oz',1.12],['Campari','1 oz',1.15],['Vermut rojo','1 oz',0.88],['Orange peel','—',0.25]],
+   note:'Equal parts, so the spec is easy to hold and easy to check.'},
+ 'Amaro — digestivo pour':{v:'nnc',glass:'Cordial',price:11.00,
+   ing:[['Amaro Montenegro','1.5 oz',1.92],['Orange twist','—',0.15]],
+   note:'The after-dinner list you do not have. Fifty-seven a week without anyone selling it.'}};
+
 /* ================= SCHEDULING INPUTS =================
    The forecast is only credible if you can see what fed it. Weather, what is on
    nearby, and the day of week are the three things that actually move covers in
@@ -764,25 +797,63 @@ const RECIPE={
    lead time — that is the whole point of counting. */
 const INV={
  taq:[['Beef flank','Beef — asada & trompo','kg',48,31,'Sysco · 2 days',18.40],
-      ['Pork shoulder','Pork — carnitas / lechón','kg',36,29,'Sysco · 2 days',11.20],
+      ['Pork shoulder','Pork — carnitas / lechón','kg',36,38,'Sysco · 2 days',11.20],
       ['Queso Oaxaca','Cheese & dairy','kg',26,14,'Saputo · 2 days',19.00],
       ['Culiacán corn','Masa & tortilla (internal)','kg',180,210,'Import · 6 weeks',2.35],
       ['Prawns 16/20','Seafood — prawn & octopus','kg',14,6,'Albion · 3 days',45.00],
-      ['Avocado','Produce','case',12,9,'Produce · 1 day',68.00],
+      ['Avocado','Produce','case',12,13,'Produce · 1 day',68.00],
       ['Delivery clamshell — large','Packaging','ea',900,420,'Uline · 5 days',0.36]],
- mez:[['Jolgorio Espadín','Agave & spirits','btl',6,0.4,'Agent · 9 days',118.00],
-      ['Espina Negra','Agave & spirits','btl',7,1.1,'Agent · 9 days',96.00],
-      ['Maestro Dobel','Agave & spirits','btl',9,5,'Agent · 9 days',72.00],
-      ['Octopus (frozen 2 kg)','Seafood — prawn & octopus','ea',11,3,'Albion · 2 days',52.00],
+ mez:[['Octopus (frozen 2 kg)','Seafood — prawn & octopus','ea',11,3,'Albion · 2 days',52.00],
+      ['Prawns 16/20','Seafood — prawn & octopus','kg',9,4,'Albion · 3 days',45.00],
+      ['Queso panela','Cheese & dairy','kg',12,13,'Saputo · 2 days',16.40],
       ['Lime','Produce','case',8,6,'Produce · 1 day',42.00],
-      ['Agave syrup','Bar sundries','L',12,9,'Agent · 5 days',18.50]],
+      ['Avocado','Produce','case',9,10,'Produce · 1 day',68.00],
+      ['Masa (from Yukon)','Masa & tortilla (internal)','kg',60,62,'Commissary · daily',2.35]],
  non:[['Fior di latte','Latticini','kg',14,4,'Latticini · 2 days',19.10],
       ['Burrata','Latticini','kg',6,2,'Latticini · 2 days',28.40],
-      ['00 flour','Flour & dough','25 kg',9,6,'Mill · 4 days',34.00],
+      ['00 flour','Flour & dough','25 kg',9,10,'Mill · 4 days',34.00],
       ['San Marzano DOP','Tomatoes','case',7,11,'Import · 3 weeks',61.00],
       ['Prosciutto di Parma','Salumi','leg',2,1,'Salumi · 10 days',290.00],
       ['Espresso beans','Coffee','kg',6,9,'Roaster · 5 days',28.00],
       ['Panini boxes','Packaging','ea',400,180,'Uline · 5 days',0.24]]};
+/* The cellar is counted separately from the kitchen: different units (bottles,
+   kegs, cases), different suppliers, different lead times, and a BC liquor
+   agent who needs nine days' notice rather than a produce van the next morning. */
+const BARINV={
+ taq:[['Espolòn Blanco','Tequila','btl',12,13,'BC Liquor · 5 days',34.00],
+      ['Altos Reposado','Tequila','btl',9,4,'BC Liquor · 5 days',41.00],
+      ['400 Conejos Espadín','Mezcal','btl',8,9,'Agent · 9 days',58.00],
+      ['Ilegal Joven','Mezcal','btl',6,2,'Agent · 9 days',74.00],
+      ['Corona / Pacífico','Beer','case',14,15,'BC Liquor · 3 days',48.00],
+      ['House red — Garnacha','Wine','btl',24,26,'BC Liquor · 5 days',13.50],
+      ['Agave syrup','Bar sundries','L',12,13,'Agent · 5 days',18.50],
+      ['Lime (bar)','Bar sundries','case',6,6,'Produce · 1 day',42.00]],
+ mez:[['Jolgorio Espadín','Mezcal','btl',6,0.4,'Agent · 9 days',118.00],
+      ['Espina Negra','Mezcal','btl',7,1.1,'Agent · 9 days',96.00],
+      ['Vida Clásico','Mezcal','btl',10,11,'Agent · 9 days',52.00],
+      ['Kuxtal Tepeztate','Mezcal','btl',4,1,'Agent · 14 days',142.00],
+      ['Maestro Dobel Diamante','Tequila','btl',9,5,'Agent · 9 days',72.00],
+      ['Fortaleza Reposado','Tequila','btl',5,2,'Agent · 14 days',98.00],
+      ['Bacanora · Sonora blanco','Other agave','btl',3,1,'Agent · 21 days',86.00],
+      ['Sotol Por Siempre','Other agave','btl',4,5,'Agent · 21 days',79.00],
+      ['Raicilla de la Sierra','Other agave','btl',3,3,'Agent · 21 days',88.00],
+      ['Modelo / Victoria','Beer','case',16,17,'BC Liquor · 3 days',52.00],
+      ['Orange wine — skin contact','Wine','btl',18,19,'Agent · 7 days',22.00],
+      ['Vermut rojo','Fortified','btl',6,7,'BC Liquor · 5 days',26.00],
+      ['Agave syrup','Bar sundries','L',12,9,'Agent · 5 days',18.50],
+      ['Sal de gusano','Bar sundries','kg',3,1.4,'Agent · 21 days',64.00]],
+ non:[['Aperol','Aperitivo','btl',8,5,'BC Liquor · 5 days',31.00],
+      ['Campari','Aperitivo','btl',5,3,'BC Liquor · 5 days',34.00],
+      ['Prosecco DOC','Wine','btl',24,26,'Agent · 7 days',17.50],
+      ['Chianti Classico','Wine','btl',18,19,'Agent · 7 days',24.00],
+      ['Pinot Grigio','Wine','btl',18,18,'Agent · 7 days',19.00],
+      ['Amaro Montenegro','Amaro','btl',4,2,'BC Liquor · 5 days',38.00],
+      ['Fernet-Branca','Amaro','btl',3,2,'BC Liquor · 5 days',36.00],
+      ['Peroni / Moretti','Beer','case',12,13,'BC Liquor · 3 days',46.00],
+      ['Grappa di Moscato','Digestivo','btl',3,3,'Agent · 14 days',54.00],
+      ['Chinotto / Aranciata','Mixers','case',10,11,'Import · 10 days',38.00]]};
+const barFor = () => BARINV[DIV==='grupo' ? (opDivs()[0]||'taq') : DIV] || BARINV.taq;
+/* Kitchen inventory excludes anything the bar counts. */
 const invFor = () => INV[DIV==='grupo' ? (opDivs()[0]||'taq') : DIV] || INV.taq;
 
 /* ================= NONNA'S OWN DATA =================
@@ -1587,6 +1658,31 @@ function paintAsst(){
 }
 function asstGo(i){ const x=asstQueue()[i]; if(x){ x.go(); ASST=false; paintAsst(); } }
 function asstRem(i){ const x=asstReminders()[i]; if(x){ x.go(); ASST=false; paintAsst(); } }
+
+/* A drink: the build, the pour cost, and where the bottle sits in the cellar. */
+DRAWERS.drink = name => {
+  const d=DRINK[name]; if(!d) return '<p class="mini">No spec written yet.</p>';
+  const cost=d.ing.reduce((a,i)=>a+i[2],0), gp=d.price-cost, p_=cost/d.price*100;
+  const v=byId(d.v);
+  return `<div class="dr-head">
+    <div class="cap">${vdot(v)} ${v.brand} · ${d.glass}</div>
+    <h3 class="f" style="font-size:23px;margin:6px 0 2px">${name}</h3></div>
+   <div class="grid g3" style="gap:10px;margin:16px 0">
+     ${stat('Menu price',$2(d.price))}
+     ${stat('Pour cost',$2(cost),null,pc(p_)+' of price',p_>30?'var(--danger)':undefined)}
+     ${stat('Gross profit',$2(gp),null,'per drink')}
+   </div>
+   <div class="card pad" style="margin-bottom:12px">
+    ${sech('The build','Costed from the bottle price in your cellar')}
+    <div class="scroll"><table class="dt"><thead><tr><th>Component</th><th>Measure</th><th class="num">Cost</th><th class="num">Share</th></tr></thead>
+     <tbody>${d.ing.sort((a,b)=>b[2]-a[2]).map(i=>`<tr><td><b>${i[0]}</b></td>
+       <td class="mono mini">${i[1]}</td><td class="num mono">${$2(i[2])}</td>
+       <td class="num mono ${i[2]/cost>0.5?'down':''}">${pc(i[2]/cost*100,0)}</td></tr>`).join('')}
+     </tbody></table></div>
+   </div>
+   <div class="bcard"><b style="font-size:13.5px">What the system makes of it</b>
+    <p class="mini" style="margin:5px 0 0">${d.note}</p></div>`;
+};
 /* =================== ICONS + NAV =================== */
 const IC={
  hoy:"M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z",
@@ -1696,17 +1792,18 @@ function recipeList(filter){
     </tbody></table></div>
    <p class="mini" style="margin-top:10px">Every line is costed against this week&rsquo;s supplier prices. When an invoice moves, these move with it — that is the difference between a recipe book and a binder.</p></div>`;
 }
-function inventoryView(cats){
-  const rows=invFor().filter(r=>!cats||cats.includes(r[1]));
+function inventoryView(opts={}){
+  const rows=opts.rows||invFor();
+  const bar=!!opts.bar;
   const short=rows.filter(r=>r[3]-r[4]>0);
   const value=rows.reduce((a,r)=>a+r[4]*r[6],0);
   const toPar=short.reduce((a,r)=>a+(r[3]-r[4])*r[6],0);
   const bySup={}; rows.forEach(r=>{const k=r[5].split('·')[0].trim(); (bySup[k]=bySup[k]||[]).push(r);});
   return `<div class="grid g4" style="margin-bottom:14px">
-   ${stat('Value on hand',$(value),null,'at last count')}
+   ${stat(bar?'Cellar value':'Value on hand',$(value),null,'at last count')}
    ${stat('Lines below par',String(short.length)+' of '+rows.length,null,short.length?'ordering needed':'all covered',short.length?'var(--danger)':'var(--success)')}
    ${stat('Cost to return to par',$(toPar),null,'if ordered today')}
-   ${stat('Last full count','3 days ago',null,'weekly is the target')}
+   ${stat('Last full count',bar?'6 days ago':'3 days ago',null,'weekly is the target')}
   </div>
   ${Object.entries(bySup).map(([sup,rs])=>`<div class="card pad" style="margin-bottom:12px">
     ${sech(sup,rs[0][5].split('·')[1]?('lead time'+rs[0][5].split('·')[1]):'')}
@@ -1720,12 +1817,32 @@ function inventoryView(cats){
         <td class="num mono">${$2(r[6])}</td>
         <td><div class="bar"><span style="width:${fill.toFixed(0)}%;background:${fill<50?'var(--danger)':fill<90?'var(--warning)':'var(--success)'}"></span></div></td>
        </tr>`}).join('')}</tbody></table></div></div>`).join('')}
-  <div class="bcard"><b style="font-size:13.5px">Counting is the point, not the chore</b>
-   <p class="mini" style="margin:5px 0 0">A count only matters if it is compared to something. Par levels turn a number in a notebook into an order that goes out on time — and into a theoretical-versus-actual figure that tells you where food is actually going.</p>
-   <button class="btn" style="margin-top:10px;padding:7px 16px;font-size:13px">Start a count</button></div>`;
+  <div class="bcard"><b style="font-size:13.5px">${bar?'A bottle count is a different job to a walk-in count':'Counting is the point, not the chore'}</b>
+   <p class="mini" style="margin:5px 0 0">${bar
+     ? 'Spirits are counted to the tenth of a bottle, not the kilo, and your agent needs nine days — twenty-one on the rarer agave. That is why the cellar runs on its own count-and-order rhythm. Weigh the open bottles; the system converts to tenths and reconciles them against the pours rung on the till.'
+     : 'A count only matters if it is compared to something. Par levels turn a number in a notebook into an order that goes out on time — and into a theoretical-versus-actual figure that tells you where food is actually going.'}</p>
+   <button class="btn" style="margin-top:10px;padding:7px 16px;font-size:13px">${bar?'Start a cellar count':'Start a count'}</button></div>`;
 }
 
 
+
+
+/* Drink specs — the bar's equivalent of the recipe book. */
+function drinkList(){
+ const names=Object.keys(DRINK).filter(n=>{const v=byId(DRINK[n].v); return v&&inDiv(v);});
+ if(!names.length) return `<div class="card pad">${empty('No drink specs written here yet','A spec is what makes a pour cost a number. Onboarding writes one per drink on the list.')}</div>`;
+ return `<div class="card pad">${sech('Drink specs','Click any drink for its full build')}
+  <div class="scroll"><table class="dt"><thead><tr><th>Drink</th><th>Glass</th><th class="num">Price</th>
+    <th class="num">Pour cost</th><th class="num">Cost %</th><th class="num">GP</th></tr></thead>
+   <tbody>${names.map(n=>{const d=DRINK[n], c=d.ing.reduce((a,i)=>a+i[2],0), p_=c/d.price*100;
+     return `<tr class="clickable" onclick="openDrawer('drink','${n.replace(/'/g,"\\'")}')">
+      <td><b>${n}</b> <span class="lk">spec →</span></td><td class="mini">${d.glass}</td>
+      <td class="num mono">${$2(d.price)}</td><td class="num mono">${$2(c)}</td>
+      <td class="num mono ${p_>30?'down':p_<20?'up':''}"><b>${pc(p_)}</b></td>
+      <td class="num mono">${$2(d.price-c)}</td></tr>`}).join('')}
+   </tbody></table></div>
+  <p class="mini" style="margin-top:10px">Pour cost is calculated from the bottle price in the cellar, so when the agent raises a mezcal these move the same day. A free-poured drink is not a spec — it is a guess that costs about 40 cents every time it is made.</p></div>`;
+}
 
 /* ---- commissary: the production week, and who is on it ---- */
 function commissarySchedule(){
@@ -2193,8 +2310,8 @@ M.bar={_head:()=>pgh('Bar & agave cellar',(DIV==='non'?'A short list, bottle by 
      <td class="num mono"><b>${$((p[1]-p[2])*p[3])}</b></td></tr>`}).join('')}</tbody></table></div>
   </div>`;
 },
- rec:()=>recipeList((n,r)=>r.ing.some(i=>i[3]==='Agave & spirits'))||'',
- inv:()=>inventoryView()};
+ rec:()=>drinkList(),
+ inv:()=>inventoryView({rows:barFor(),bar:true})};
 M.men={_head:()=>pgh('Menu engineering',(DIV==='non'?'Two rooms and a truck selling the same food at three different prices.':'Four menus, four price ladders, one kitchen network.')),
  brd:()=>{
  const rows=scoped(MENU,1).map(m=>({n:m[0],v:m[1],p:m[2],c:m[3],u:m[4],gp:m[2]-m[3],tot:(m[2]-m[3])*m[4]}));
