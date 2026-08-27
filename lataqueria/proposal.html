@@ -167,6 +167,15 @@ ul.cl li.no{color:var(--ink-muted)}
 .toc a{font-size:12.5px;padding:6px 13px;border-radius:999px;border:1px solid var(--border-strong);color:var(--ink-2);text-decoration:none}
 .toc a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
 .foot{border-top:1px solid var(--border);padding-top:26px;font-size:12.5px;color:var(--ink-muted);line-height:1.6}
+/* --- price block: the numbers must never need a sideways swipe --- */
+.prices{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0 14px}
+.pricecard{border:1px solid var(--border);border-radius:var(--r-xl);padding:22px;background:var(--surface);box-shadow:var(--sh-sm)}
+.plabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:14px}
+.pnum{font-family:var(--serif);font-weight:300;font-size:46px;line-height:1;letter-spacing:-.028em;color:var(--ink);font-variant-numeric:tabular-nums}
+.pnum .per{font-size:17px;color:var(--ink-muted);letter-spacing:0}
+.psplit{margin-top:11px;padding-top:11px;border-top:1px solid var(--border);font-size:13px;color:var(--accent);font-weight:500;font-variant-numeric:tabular-nums}
+.pricecard p.mini{margin:11px 0 0;line-height:1.55}
+
 @media print{.top,.toc{display:none}section{page-break-inside:avoid}}
 /* ==================== RESPONSIVE — authoritative, all pages ==================== */
 .hide-sm{display:inline}
@@ -374,6 +383,39 @@ ul.cl li.no{color:var(--ink-muted)}
     padding-bottom:7px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
   .whosw::-webkit-scrollbar{display:none}
 }
+/* ===== proposal, phone widths =====
+   Injected AFTER _responsive.css. The demo pins a label column and scrolls
+   sideways; a proposal must not — a reader on a phone has to see every
+   number without discovering a horizontal swipe. So tables stack. */
+@media(max-width:640px){
+ .wrapp{padding:0 16px 70px}
+ h1.dh{font-size:36px}
+ h2.sh{font-size:25px}
+ .prices{grid-template-columns:1fr}
+ .pnum{font-size:42px}
+ .wrapp .grid.g3,.wrapp .grid.g2{grid-template-columns:1fr}
+ .wrapp .scroll{overflow-x:visible}
+ .wrapp .scroll table.dt{min-width:0}
+ .wrapp .scroll table.dt,
+ .wrapp .scroll table.dt tbody,
+ .wrapp .scroll table.dt tr,
+ .wrapp .scroll table.dt td{display:block;width:auto}
+ .wrapp .scroll table.dt thead{display:none}
+ .wrapp .scroll table.dt tr{padding:14px 0;border-bottom:1px solid var(--border)}
+ .wrapp .scroll table.dt tbody tr:last-child{border-bottom:0}
+ .wrapp .scroll table.dt tbody tr:hover{background:transparent}
+ .wrapp .scroll table.dt td{padding:3px 0;border-bottom:0;text-align:left;position:static}
+ .wrapp .scroll table.dt td:first-child{position:static;background:transparent;font-size:14px}
+ .wrapp .scroll table.dt td:first-child::after{display:none}
+ .wrapp .scroll table.dt td[data-l]{display:flex;gap:14px;align-items:baseline;justify-content:space-between}
+ .wrapp .scroll table.dt td[data-l]::before{content:attr(data-l);font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-muted);flex:none;padding-top:2px}
+ .wrapp .scroll table.dt td[data-l].mini{display:block}
+ .wrapp .scroll table.dt td[data-l].mini::before{display:block;margin-bottom:3px}
+ .wrapp .scroll table.dt td.num{font-size:15px;text-align:right}
+ .wrapp .scroll table.dt tr[style*="sunken"]{padding:14px 13px;margin-top:4px;border-radius:var(--r-md)}
+ .wrapp .card{padding:14px 15px}
+}
 </style>
 <script src="assets/i18n.js"></script>
 </head>
@@ -392,7 +434,7 @@ ul.cl li.no{color:var(--ink-muted)}
 <div class="eyebrow">Proposal · Prepared August 2026</div>
 <h1 class="dh">Three groups.<br>One platform.<br>Eight rooms.</h1>
 <p class="big" style="max-width:640px">La Taquería and its commissary. La Mezcalería, Chupito and the Stanley Park patio. And now Nonna&rsquo;s Cucina, a block up Commercial Drive. Three companies, three sets of books, three partners — and no single place to look at any of it.</p>
-<p style="max-width:640px">This is a bespoke build: one platform, three divisions, each with its own branding, its own data and its own budgets — and a group view for whoever is entitled to see across them. One build cost, one monthly cost, <b>split three ways and invoiced separately</b> so each company deducts its own. Payment plans available on the build.</p>
+<p style="max-width:640px">This is a bespoke build: one platform, three divisions, each with its own branding, its own data and its own budgets — and a group view for whoever is entitled to see across them. One build cost and one monthly cost for the whole group. We can invoice the companies separately in whatever proportion you decide between you — how you divide it is your call, not ours. Payment plans available on the build.</p>
 
 <div class="row wrap" style="gap:10px;margin:30px 0 0">
  <a class="btn" href="demo-custom.html">Open the demo · switch between the groups and the people →</a>
@@ -606,23 +648,30 @@ ul.cl li.no{color:var(--ink-muted)}
 </div>
 
 <h3 class="ss" style="margin:34px 0 10px">What it costs</h3>
-<div class="card" style="margin-bottom:20px"><div class="scroll"><table class="dt">
- <thead><tr><th>&nbsp;</th><th class="num">Total</th><th class="num">Split three ways</th></tr></thead><tbody>
- <tr><td><b>Build — the whole platform, all three divisions</b><div class="mini">Unlimited venues and logins. Adding a location later costs nothing.</div></td>
-  <td class="num mono"><b>$28,000</b></td><td class="num mono">$9,333 each</td></tr>
- <tr><td><b>Monthly</b><div class="mini">Invoiced to each company separately, so each deducts its own.</div></td>
-  <td class="num mono"><b>$1,200</b></td><td class="num mono"><b>$400 each</b></td></tr>
- <tr style="background:var(--sunken)"><td><b>Marketing &amp; ad spend</b><div class="mini">Meta and Google, on each location&rsquo;s own card. You set the ceiling; we never touch the money.</div></td>
-  <td class="num mono">separate</td><td class="num mono">per company</td></tr>
-</tbody></table></div></div>
+<div class="prices">
+ <div class="pricecard">
+  <div class="plabel">Build — one time</div>
+  <div class="pnum">$28,000</div>
+  <div class="psplit">One price for the whole group</div>
+  <p class="mini">The whole platform, all three divisions. Unlimited venues and logins — adding a location later costs nothing.</p>
+ </div>
+ <div class="pricecard">
+  <div class="plabel">Monthly — ongoing</div>
+  <div class="pnum">$1,200<span class="per">/mo</span></div>
+  <div class="psplit">Invoiced however you choose to divide it</div>
+  <p class="mini">We can bill each company separately so each one deducts its own share — you tell us the proportions.</p>
+ </div>
+</div>
+<div class="flowbox" style="margin-bottom:22px"><b style="font-size:13.5px">Marketing &amp; ad spend is separate</b>
+ <p class="mini" style="margin:6px 0 0">Meta and Google run on each location’s own card, per company. You set the ceiling; we never touch the money.</p></div>
 
 <div class="grid g3" style="gap:14px;margin-bottom:24px">
  <div class="flowbox"><b style="font-size:13.5px">Payment plans</b>
-  <p class="mini" style="margin:6px 0 0">The build can be spread across the first six or twelve months at no extra cost — roughly $1,555 or $780 a month for the group, before the split. If a different shape suits your cash flow, say so and we will build around it.</p></div>
+  <p class="mini" style="margin:6px 0 0">The build can be spread across the first six or twelve months at no extra cost — roughly $1,555 or $780 a month for the group. If a different shape suits your cash flow, say so and we will build around it.</p></div>
  <div class="flowbox"><b style="font-size:13.5px">Nothing is per-location</b>
   <p class="mini" style="margin:6px 0 0">Eight rooms or eighteen, the number does not move. That is the whole pricing idea, and it is why adding Nonna&rsquo;s to the build costs nothing extra rather than a third more.</p></div>
  <div class="flowbox"><b style="font-size:13.5px">Referrals</b>
-  <p class="mini" style="margin:6px 0 0">$5,000 back on every full build you introduce — taken as a payment or as a discount against your own monthly, whichever you prefer. Several of you mentioned operators who have the same problem.</p></div>
+  <p class="mini" style="margin:6px 0 0">15% commission on every sale from a client you introduce, paid to you as and when they pay us. Take it in cash or as a discount against your own monthly, whichever you prefer. Several of you mentioned operators who have the same problem.</p></div>
 </div>
 
 <h3 class="ss" style="margin:30px 0 8px">What the build includes</h3>
@@ -757,6 +806,16 @@ Prepared by Telaia · a product of Loom Tech Ltd. Pricing valid 60 days. Payment
 <script>
 function tg(){const h=document.documentElement,d=h.dataset.theme==='dark';
  h.dataset.theme=d?'light':'dark';document.getElementById('tb').textContent=d?'Dark':'Light';applyLang();}
+/* Stamp each cell with its column heading so tables can stack on phones
+   without any column scrolling off the side of the screen. */
+(function labelCells(){
+ document.querySelectorAll('table.dt').forEach(t=>{
+  const hs=[...t.querySelectorAll('thead th')].map(h=>h.textContent.replace(/\s+/g,' ').trim());
+  if(!hs.length) return;
+  t.querySelectorAll('tbody tr').forEach(r=>{
+   [...r.children].forEach((td,i)=>{ const l=hs[i];
+    if(i>0 && l && l!==' ') td.setAttribute('data-l',l); });});});
+})();
 applyLang();
 
 </script>
