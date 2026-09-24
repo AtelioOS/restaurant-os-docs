@@ -1,0 +1,195 @@
+<title>Mezcalería Operating System</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --canvas:#FBF7F9; --surface:#FFFFFF; --sunken:#F4F0F2;
+  --ink:#2A1520; --ink-2:#4F3A44; --muted:#6B5060; --faint:#9D8692;
+  --rule:#EADCE3; --rule-strong:#D7C0CC;
+  --mez:#C22273; --mez-deep:#A81A61; --mez-soft:#F9E6F0;
+  --go:#1D9972; --go-soft:#DCEFE8; --warn:#A47D17; --stop:#B54E12;
+  --shadow:0 1px 3px rgba(42,21,32,.06);
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --canvas:#181014; --surface:#221820; --sunken:#1E151B;
+  --ink:#F5E9EF; --ink-2:#D6C5CE; --muted:#A8919E; --faint:#7D6874;
+  --rule:#372A31; --rule-strong:#4A3A42;
+  --mez:#E257A0; --mez-deep:#F07AB8; --mez-soft:#331A28;
+  --go:#4DBF9B; --go-soft:#16302A; --warn:#CFA53F; --stop:#DB7A42;
+  --shadow:0 1px 3px rgba(0,0,0,.4);
+}}
+:root[data-theme="dark"]{
+  --canvas:#181014; --surface:#221820; --sunken:#1E151B;
+  --ink:#F5E9EF; --ink-2:#D6C5CE; --muted:#A8919E; --faint:#7D6874;
+  --rule:#372A31; --rule-strong:#4A3A42;
+  --mez:#E257A0; --mez-deep:#F07AB8; --mez-soft:#331A28;
+  --go:#4DBF9B; --go-soft:#16302A; --warn:#CFA53F; --stop:#DB7A42;
+  --shadow:0 1px 3px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:800px;margin:0 auto;padding:44px 22px 80px}
+.lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mez)}
+h1{font-family:var(--serif);font-weight:300;font-size:clamp(30px,6vw,44px);line-height:1.04;
+  letter-spacing:-.026em;margin:11px 0 13px;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:400;font-size:23px;letter-spacing:-.018em;margin:0 0 4px}
+h3{font-size:14.5px;font-weight:600;margin:0 0 5px}
+p{margin:0 0 14px;color:var(--ink-2);max-width:66ch}
+.lede{font-size:17px;color:var(--ink)}
+section{margin-top:48px}
+.sh{padding-bottom:9px;border-bottom:1px solid var(--rule);margin-bottom:20px}
+.sh p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+
+/* the swap */
+.swap{display:grid;grid-template-columns:1fr 46px 1fr;gap:0;align-items:stretch;margin-top:24px}
+.col{background:var(--surface);border:1px solid var(--rule);border-radius:11px;padding:19px;box-shadow:var(--shadow)}
+.col.to{border-color:var(--mez)}
+.col h3{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:14px}
+.col.to h3{color:var(--mez)}
+.arrow{display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:19px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--rule);
+  font-size:13.5px}
+.row:last-of-type{border-bottom:0}
+.row span:last-child{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.tot{display:flex;justify-content:space-between;gap:12px;margin-top:12px;padding-top:11px;
+  border-top:1.5px solid var(--rule-strong);font-size:14px;font-weight:600}
+.tot span:last-child{font-variant-numeric:tabular-nums}
+.big{font-family:var(--serif);font-weight:300;font-size:38px;line-height:1;letter-spacing:-.026em;
+  font-variant-numeric:tabular-nums;margin:2px 0 4px}
+.big .per{font-size:15px;color:var(--muted);letter-spacing:0}
+
+ul.t{list-style:none;padding:0;margin:0}
+ul.t li{padding:10px 0 10px 24px;position:relative;border-bottom:1px solid var(--rule);
+  font-size:14px;color:var(--ink-2)}
+ul.t li:last-child{border-bottom:0}
+ul.t li::before{content:'';position:absolute;left:4px;top:18px;width:6px;height:6px;
+  border-radius:99px;background:var(--mez)}
+ul.t li b{color:var(--ink)}
+
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:13px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow)}
+.card p{font-size:12.5px;margin:0;line-height:1.55}
+
+.step{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--rule)}
+.step:first-of-type{border-top:0;padding-top:0}
+.step .n{font-family:var(--mono);font-size:11px;color:var(--mez);padding-top:2px;font-weight:500}
+.step p{margin:0;font-size:13.5px}
+.step b{color:var(--ink)}
+.mech{background:var(--surface);border:1px solid var(--rule);border-radius:11px;padding:20px 22px;
+  margin-top:18px;box-shadow:var(--shadow)}
+
+.sprint{display:grid;grid-template-columns:96px 1fr;gap:18px;padding:13px 0;border-top:1px solid var(--rule)}
+.sprint:first-of-type{border-top:0}
+.sprint .wk{font-family:var(--mono);font-size:11px;color:var(--mez);padding-top:2px;font-weight:500}
+.sprint p{margin:0;font-size:13.5px}
+
+.note{border:1px solid var(--rule);border-left:3px solid var(--mez);border-radius:8px;
+  background:var(--surface);padding:16px 18px;margin-top:22px}
+.note h3{color:var(--mez)}
+.note p{margin:0;font-size:13.5px}
+.foot{margin-top:54px;padding-top:18px;border-top:1px solid var(--rule);font-size:12px;color:var(--muted)}
+@media(max-width:600px){
+  .wrap{padding:28px 15px 60px}
+  .swap{grid-template-columns:1fr;gap:10px}
+  .arrow{transform:rotate(90deg);height:26px}
+  .sprint{grid-template-columns:1fr;gap:4px}
+}
+</style>
+
+<div class="wrap">
+
+<div class="lbl">Telaia · Loom Tech Ltd · proposal for Ignacio Arrieta</div>
+<h1>One system instead of eleven, and it costs you less attention than any of them</h1>
+<p class="lede">You said it yourself: the ideas are there, the manual is written, but things do not follow through unless you are standing over them. This is not another tool to check. It is one place where the numbers land on their own, and one half-hour a week where we look at them together and decide what to do.</p>
+
+<section>
+  <div class="sh"><h2>What it costs, against what you pay now</h2>
+  <p>$1,200 a month, all in — one invoice to La Mezcalería</p></div>
+
+  <div class="swap">
+    <div class="col">
+      <h3>What you pay today</h3>
+      <div class="row"><span>ChatGPT Pro</span><span>$300</span></div>
+      <div class="row"><span>Claude Pro</span><span>$300</span></div>
+      <div class="row"><span>Music subscription</span><span>$25</span></div>
+      <div class="row"><span>Bookkeeping software</span><span>separate</span></div>
+      <div class="row"><span>Payroll</span><span>separate</span></div>
+      <div class="row"><span>Scheduling</span><span>separate</span></div>
+      <div class="row"><span>Marketing tools</span><span>separate</span></div>
+      <div class="tot"><span>AI subscriptions alone</span><span>$625/mo</span></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="col to">
+      <h3>What you would pay</h3>
+      <div class="big">$1,200<span class="per">/mo</span></div>
+      <p style="font-size:13px;margin:0 0 14px">Everything above, in one system. No setup fee, nothing on signature, and no separate charge for AI usage however hard you lean on it.</p>
+      <div class="row"><span>Setup &amp; implementation</span><span>$0</span></div>
+      <div class="row"><span>Hosting &amp; AI usage</span><span>included</span></div>
+      <div class="row"><span>Weekly review, 30 min</span><span>included</span></div>
+      <div class="row"><span>Training, English</span><span>included</span></div>
+      <div class="tot"><span>Net new spend</span><span>$575/mo</span></div>
+    </div>
+  </div>
+  <p style="margin-top:16px;font-size:13px;color:var(--muted)">Against the two AI subscriptions alone. Once the bookkeeping, payroll, scheduling and marketing tools come off the list, the gap closes further — and those are the ones costing you time as well as money.</p>
+</section>
+
+<section>
+  <div class="sh"><h2>The setup fee is nil, and it stays nil</h2>
+  <p>You put your commission toward the build only when it suits you</p></div>
+  <p>The build is real work and we are carrying it. Rather than invoice you for it, it sits as a <b>$12,000 credit</b> against your account, and the commission you earn selling Telaia to other operators can be applied against it — at whatever pace you choose.</p>
+  <div class="mech">
+    <div class="step"><div class="n">01</div><p>Nothing on signature. A <b>$12,000 build credit</b> sits against your account.</p></div>
+    <div class="step"><div class="n">02</div><p>You earn <b>16% of the setup fee</b> on every client you bring in.</p></div>
+    <div class="step"><div class="n">03</div><p>Each time a deal closes, <b>you tell us the split</b> — how much goes to the credit, how much comes to you in cash. Anywhere from nothing to all of it, and a different answer every time is fine. If the month has been hard, take the cash.</p></div>
+    <div class="step"><div class="n">04</div><p>Put it all toward the build and <b>three custom builds clears it</b>. Put half and it takes six.</p></div>
+    <div class="step"><div class="n">05</div><p>If you never put anything toward it, <b>nothing happens</b>. It is never turned into an invoice, and it is written off after three years.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sh"><h2>What it actually does</h2>
+  <p>The things you said were falling through</p></div>
+  <ul class="t">
+    <li><b>The receipts nobody hands in.</b> Invoices are captured and coded as they arrive, so the month does not end with you chasing paper. The accountant gets a clean export instead of a shoebox.</li>
+    <li><b>Labour against what the room is actually doing.</b> Rostering built from forecast covers rather than last week's roster copied forward — which is the argument for whether lunch comes back, and at what staffing.</li>
+    <li><b>The cellar.</b> Around two hundred agave labels counted in bottles, pour cost on every drink, and the bottles open longest surfaced instead of buried at the back.</li>
+    <li><b>Catering as a real product.</b> Patio as the entry tier, Mezcalería as the elevated one, each with structured packages and prices so quoting an event is not a negotiation from scratch every time.</li>
+    <li><b>Marketing in one place.</b> Google profiles, reviews and replies, campaigns running to a ceiling you set — on your own card, never through us.</li>
+    <li><b>A training system that sticks.</b> Your manual, loaded in, assigned, and tracked — so implementing it is not another thing that needs you standing over it.</li>
+  </ul>
+  <div class="note">
+    <h3>Private, and yours</h3>
+    <p>Your instance is built for you and is not shared with any other business. Nothing you put in it trains anything that anyone else uses, and nothing about your operation leaves it. Your data is exportable in full, at any time, and there is no lock-in period — you can stop whenever you want.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sh"><h2>Eight weeks</h2>
+  <p>Measured from the day access lands, not from signature</p></div>
+  <div class="sprint"><div class="wk">Week 0</div><div><p><b>Readiness.</b> Toast credentials, Tock, the delivery platforms, Google, and a QuickBooks export from your accountant. Your system switched on, with the restaurant and both catering lines set up.</p></div></div>
+  <div class="sprint"><div class="wk">Weeks 1–2</div><div><p><b>The restaurant live.</b> Toast and Tock connected, delivery platforms in, yesterday's sales and covers in the system by 9am without anybody touching a spreadsheet.</p></div></div>
+  <div class="sprint"><div class="wk">Weeks 3–4</div><div><p><b>The cellar and the menu.</b> Agave counted in bottles, pour cost per drink, every plate and cocktail costed against your real invoices.</p></div></div>
+  <div class="sprint"><div class="wk">Weeks 5–6</div><div><p><b>The money.</b> Reconciliation running, a true P&amp;L for the restaurant and for each catering line, payroll and scheduling moved across, rostering to forecast.</p></div></div>
+  <div class="sprint"><div class="wk">Weeks 7–8</div><div><p><b>Catering and handover.</b> Patio and Mezcalería packages priced, event calendar and client records live, Google corrected, your team trained, and us out of the room.</p></div></div>
+</section>
+
+<section>
+  <div class="sh"><h2>What we need from you</h2>
+  <p>Short, and none of it is a surprise</p></div>
+  <div class="g2">
+    <div class="card"><h3>Seven accesses</h3><p>Toast API, Tock, Uber Eats, DoorDash, Skip, Google Business Profile, and a QuickBooks export. The export is the one to chase first — your accountant holds that file and it is the likeliest thing to hold us up.</p></div>
+    <div class="card"><h3>Three months of invoices</h3><p>Including the agave and spirits accounts, plus the current cellar list with bottle costs and pour sizes. However they exist today.</p></div>
+    <div class="card"><h3>Half an hour a week</h3><p>WhatsApp, email or a call. Held whether or not anything is wrong — that is the whole mechanism by which things stop falling through.</p></div>
+    <div class="card"><h3>Your list of problems</h3><p>You said you would write down what needs fixing before year end. That list is the most valuable thing you can give us, and it shapes what gets built after week eight.</p></div>
+  </div>
+</section>
+
+<div class="foot">
+  Loom Tech Ltd · British Columbia · all figures CAD, exclusive of GST. This proposal is a summary; the Partner &amp; Platform Agreement is the binding document. Prepared 24 September 2026 for Ignacio Arrieta, La Mezcalería.
+</div>
+
+</div>
