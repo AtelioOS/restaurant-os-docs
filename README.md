@@ -4,3 +4,4 @@ Product demo + proposals for **Atelio Restaurant OS** — the productized restau
 
 - **Live demo:** https://atelioos.github.io/restaurant-os-docs/
 - **Proposal (Blaze Gourmet Burgers):** https://atelioos.github.io/restaurant-os-docs/Proposal.html
+- **La Mezcalería — build plan:** https://atelioos.github.io/restaurant-os-docs/mezcaleria/
