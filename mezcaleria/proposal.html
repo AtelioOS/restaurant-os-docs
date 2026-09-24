@@ -58,6 +58,14 @@ section{margin-top:48px}
 .tot{display:flex;justify-content:space-between;gap:12px;margin-top:12px;padding-top:11px;
   border-top:1.5px solid var(--rule-strong);font-size:14px;font-weight:600}
 .tot span:last-child{font-variant-numeric:tabular-nums}
+.grp{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 5px}
+.grp.sp{margin-top:20px}
+.row span:first-child{min-width:0}
+.row i{display:block;font-style:normal;font-size:11.5px;line-height:1.35;color:var(--faint);margin-top:1px}
+.row.stay span:last-child{color:var(--faint)}
+.fine{margin-top:16px;font-size:12.5px;line-height:1.62;color:var(--muted)}
+.fine b{color:var(--ink-2)}
 .big{font-family:var(--serif);font-weight:300;font-size:38px;line-height:1;letter-spacing:-.026em;
   font-variant-numeric:tabular-nums;margin:2px 0 4px}
 .big .per{font-size:15px;color:var(--muted);letter-spacing:0}
@@ -113,28 +121,34 @@ ul.t li b{color:var(--ink)}
   <div class="swap">
     <div class="col">
       <h3>What you pay today</h3>
+      <div class="grp">Telaia replaces these</div>
       <div class="row"><span>ChatGPT Pro</span><span>$300</span></div>
       <div class="row"><span>Claude Pro</span><span>$300</span></div>
       <div class="row"><span>Music subscription</span><span>$25</span></div>
-      <div class="row"><span>Bookkeeping software</span><span>separate</span></div>
-      <div class="row"><span>Payroll</span><span>separate</span></div>
-      <div class="row"><span>Scheduling</span><span>separate</span></div>
-      <div class="row"><span>Marketing tools</span><span>separate</span></div>
-      <div class="tot"><span>AI subscriptions alone</span><span>$625/mo</span></div>
+      <div class="row"><span>Push Operations<i>Scheduling, time, payroll</i></span><span>$200</span></div>
+      <div class="row"><span>MarginEdge<i>Invoices, food and pour cost</i></span><span>$493</span></div>
+      <div class="tot"><span>Comes off the list</span><span>$1,318/mo</span></div>
+
+      <div class="grp sp">Stays either way — we plug into these</div>
+      <div class="row stay"><span>Toast<i>Essentials tier or higher</i></span><span>$220</span></div>
+      <div class="row stay"><span>Tock<i>Reservations and events</i></span><span>$407</span></div>
+      <div class="row stay"><span>QuickBooks<i>Your accountant’s file, untouched</i></span><span>unchanged</span></div>
     </div>
     <div class="arrow">→</div>
     <div class="col to">
       <h3>What you would pay</h3>
       <div class="big">$1,200<span class="per">/mo</span></div>
-      <p style="font-size:13px;margin:0 0 14px">Everything above, in one system. No setup fee, nothing on signature, and no separate charge for AI usage however hard you lean on it.</p>
+      <p style="font-size:13px;margin:0 0 14px">One invoice to La Mezcalería. No setup fee, nothing on signature, and no separate charge for AI usage however hard you lean on it.</p>
       <div class="row"><span>Setup &amp; implementation</span><span>$0</span></div>
       <div class="row"><span>Hosting &amp; AI usage</span><span>included</span></div>
+      <div class="row"><span>AI phone answering<i>Worth CA$379–539 on its own</i></span><span>included</span></div>
       <div class="row"><span>Weekly review, 30 min</span><span>included</span></div>
       <div class="row"><span>Training, English</span><span>included</span></div>
-      <div class="tot"><span>Net new spend</span><span>$575/mo</span></div>
+      <div class="tot"><span>Against what comes off</span><span>$118/mo less</span></div>
     </div>
   </div>
-  <p style="margin-top:16px;font-size:13px;color:var(--muted)">Against the two AI subscriptions alone. Once the bookkeeping, payroll, scheduling and marketing tools come off the list, the gap closes further — and those are the ones costing you time as well as money.</p>
+  <p class="fine"><b>You already spend more than this.</b> The system costs less per month than the tools it takes off your hands, and the phone answering comes with it rather than as another subscription. The three that stay — Toast, Tock and your accountant’s QuickBooks — we connect to and read from; we do not replace them and we do not touch the money in them.</p>
+  <p class="fine">Your ChatGPT, Claude and music figures are the ones you gave us. The rest are public list prices as they stand today: Push’s Canadian entry tier, MarginEdge at US$350 and Tock at US$289 converted at 1.41, Toast Canada’s Essentials tier. Send us your real invoices with the QuickBooks export and we will put your own numbers in — they are usually higher, not lower. One thing to check with Toast: the connection needs your plan at Essentials or above, which is their requirement for data access, not ours.</p>
 </section>
 
 <section>
@@ -158,6 +172,7 @@ ul.t li b{color:var(--ink)}
     <li><b>Labour against what the room is actually doing.</b> Rostering built from forecast covers rather than last week's roster copied forward — which is the argument for whether lunch comes back, and at what staffing.</li>
     <li><b>The cellar.</b> Around two hundred agave labels counted in bottles, pour cost on every drink, and the bottles open longest surfaced instead of buried at the back.</li>
     <li><b>Catering as a real product.</b> Patio as the entry tier, Mezcalería as the elevated one, each with structured packages and prices so quoting an event is not a negotiation from scratch every time.</li>
+    <li><b>The phone answered, every time.</b> An AI host that picks up when the room is full — hours, directions, the booking handed to Tock, and a catering enquiry written down instead of lost. It never sends anyone to voicemail at seven on a Friday.</li>
     <li><b>Marketing in one place.</b> Google profiles, reviews and replies, campaigns running to a ceiling you set — on your own card, never through us.</li>
     <li><b>A training system that sticks.</b> Your manual, loaded in, assigned, and tracked — so implementing it is not another thing that needs you standing over it.</li>
   </ul>
