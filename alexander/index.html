@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>The Alexander · Venue OS — a Telaia demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Anton&display=swap" rel="stylesheet">
+<style>
+:root{
+  --canvas:#F5F0E8; --surface:#FFFFFF; --sunken:#EDE6DA; --border:#E0D7C8; --border2:#CBBFAC;
+  --ink:#1F1A16; --ink2:#4E443B; --mute:#776B5F;
+  --brick:#8E3B2B; --brick-fill:#A9472F; --brick-soft:#F6E7E1;
+  --brass:#8A6A2F; --brass-fill:#B89150; --iron:#2B2A28;
+  --mez:#C22273; --mez-fill:#DE3189; --mez-mint:#C7E0D1; --mez-green:#209D50;
+  --ok:#3F6B48; --ok-soft:#E3EFE4; --warn:#8A5A08; --warn-soft:#F8EED6; --bad:#A32E22; --bad-soft:#F7E2DF; --info:#1F5F8B; --info-soft:#E1ECF4;
+  --s1:#B54E12; --s2:#136FD6; --s3:#A47D17; --s4:#B71AB1; --s5:#1D9972; --s6:#7D39F7;
+  --display:'Cormorant Garamond',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --sh:0 1px 2px rgba(45,35,25,.06),0 4px 14px rgba(45,35,25,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font:14px/1.5 var(--sans);color:var(--ink);background:var(--canvas);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.num,table,.stat b{font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100svh}
+/* rail */
+.side{background:var(--iron);color:#EDE6DA;position:sticky;top:0;height:100svh;display:flex;flex-direction:column;padding:18px 12px;overflow-y:auto}
+.brand{padding:4px 10px 16px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px}
+.brand .w{font-family:var(--display);font-size:27px;font-weight:500;letter-spacing:.01em;line-height:1}
+.brand .w i{font-style:italic;color:var(--brass-fill)}
+.brand .s{font:500 10px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#A89C8C;margin-top:6px}
+#nav{display:flex;flex-direction:column;gap:2px}
+#nav button{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;text-align:left;color:#D8CFC2;font-size:13.5px}
+#nav button:hover{background:rgba(255,255,255,.06)}
+#nav button.on{background:rgba(184,145,80,.18);color:#fff}
+#nav button.on .dot{background:var(--brass-fill)}
+#nav .dot{width:7px;height:7px;border-radius:50%;background:#5A5249;flex:none}
+#nav .grp{font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#8C8174;padding:14px 10px 4px}
+#nav .mezdot{background:var(--mez-fill)!important}
+.side .foot{margin-top:auto;padding:14px 10px 0;border-top:1px solid rgba(255,255,255,.1);font-size:11.5px;color:#A89C8C}
+.side .foot b{color:#EDE6DA;font-weight:500}
+.mtop{display:none}
+/* main */
+.main{min-width:0;display:flex;flex-direction:column}
+.ctx{position:sticky;top:0;z-index:20;background:rgba(245,240,232,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 26px;overflow-x:auto}
+.ctx h1{font:500 26px/1.1 var(--display);white-space:nowrap}
+.ctx .crumb{font:500 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);white-space:nowrap}
+.ctx .sp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid var(--border2);background:var(--surface);font-size:12.5px;font-weight:500;white-space:nowrap;flex:none}
+.pill.pri{background:var(--brick);border-color:var(--brick);color:#fff}
+.pill.mez{background:var(--mez);border-color:var(--mez);color:#fff}
+.pill:hover{filter:brightness(.97)}
+.demo-banner{background:var(--sunken);border-bottom:1px solid var(--border);font-size:12px;color:var(--ink2);padding:7px 26px;display:flex;gap:10px;align-items:center}
+.demo-banner b{font-weight:600}
+.demo-banner button{margin-left:auto;font-size:12px;text-decoration:underline;color:var(--brick)}
+.wbody{padding:16px 26px 40px}
+.lede{color:var(--ink2);max-width:760px;margin-bottom:13px;font-size:14.5px}
+.lede b{color:var(--ink);font-weight:600}
+/* grids */
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:1fr 1fr}
+.split64{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;align-items:start}
+.split46{display:grid;grid-template-columns:1fr 1.4fr;gap:12px;align-items:start}
+.grid>*,.split64>*,.split46>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh);margin-bottom:12px;overflow:hidden}
+.grid>.card,.split64>.card,.split46>.card,.split64>div>.card:last-child,.split46>div>.card:last-child{margin-bottom:0}
+.split64,.split46,.grid{margin-bottom:12px}
+.hd{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.hd h3{font-size:13.5px;font-weight:600}
+.hd .sub{font-size:12px;color:var(--mute)}
+.hd .r{margin-left:auto;display:flex;gap:6px;align-items:center}
+.bd{padding:13px 14px}
+.lab{font:500 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+/* stat tiles */
+.stat{padding:12px 14px}
+.stat b{display:block;font:400 32px/1.05 var(--display);margin:4px 0 2px}
+.stat .d{font-size:12px;color:var(--mute)}
+.stat .d.up{color:var(--ok)} .stat .d.dn{color:var(--bad)}
+.stat.accent{border-top:3px solid var(--brick-fill)}
+.stat.mz{border-top:3px solid var(--mez-fill)}
+/* tables */
+.scroll{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.dt th{font:500 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);text-align:left;padding:8px 11px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+table.dt td{padding:9px 11px;border-bottom:1px solid var(--sunken);vertical-align:middle}
+table.dt tr:last-child td{border-bottom:0}
+table.dt tr.click{cursor:pointer} table.dt tr.click:hover td{background:#FBF8F3}
+table.dt td.r,table.dt th.r{text-align:right}
+.mono{font-family:var(--mono);font-size:12px}
+.muted{color:var(--mute)}
+.b{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:500;white-space:nowrap;border:1px solid transparent}
+.b.ok{background:var(--ok-soft);color:var(--ok)} .b.warn{background:var(--warn-soft);color:var(--warn)} .b.bad{background:var(--bad-soft);color:var(--bad)} .b.info{background:var(--info-soft);color:var(--info)} .b.n{background:var(--sunken);color:var(--ink2)}
+.b.mz{background:#FBE3EF;color:var(--mez)} .b.br{background:var(--brick-soft);color:var(--brick)}
+.sw{display:inline-block;width:9px;height:9px;border-radius:2px;flex:none}
+.moretog{display:block;width:100%;padding:9px;font-size:12.5px;color:var(--brick);font-weight:500;border-top:1px solid var(--sunken)}
+.chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:6px 13px;border-radius:999px;border:1px solid var(--border2);font-size:12.5px;white-space:nowrap;flex:none;background:var(--surface)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--canvas)}
+/* charts */
+.hb{display:grid;grid-template-columns:minmax(110px,170px) 1fr 74px;gap:8px;align-items:center;margin:7px 0;font-size:13px}
+.hb .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb .lbl small{display:block;color:var(--mute);font-size:11.5px}
+.hb .trk{height:12px;background:var(--sunken);border-radius:3px;overflow:hidden;display:flex}
+.hb .trk i{display:block;height:100%}
+.hb .v{text-align:right;font-family:var(--mono);font-size:12px}
+.split{display:flex;height:16px;border-radius:4px;overflow:hidden;gap:2px;margin:6px 0 10px}
+.split i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.cols{display:flex;align-items:flex-end;gap:3px;height:100px;padding-top:6px}
+.cols .c{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-width:0}
+.cols .c i{display:block;border-radius:2px 2px 0 0}
+.colx{display:flex;gap:3px;font:10px var(--mono);color:var(--mute);margin-top:4px}
+.colx span{flex:1;text-align:center;min-width:0;overflow:hidden}
+.meter{height:10px;background:var(--sunken);border-radius:5px;overflow:hidden;margin:6px 0 4px;position:relative}
+.meter i{display:block;height:100%;border-radius:5px}
+.funnel .st{display:flex;align-items:center;gap:10px;margin:6px 0}
+.funnel .st .bar{height:26px;border-radius:4px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:12.5px;font-weight:500;white-space:nowrap;min-width:40px}
+.funnel .st .n{font-family:var(--mono);font-size:12px;color:var(--mute)}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .dh{font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);padding:2px 4px}
+.cal .d{min-height:78px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;font-size:11px;cursor:default;min-width:0;overflow:hidden}
+.cal .d.out{background:transparent;border-style:dashed;opacity:.5}
+.cal .d.today{outline:2px solid var(--brick-fill);outline-offset:-1px}
+.cal .d .n{font-family:var(--mono);font-size:11px;color:var(--mute)}
+.cal .ev{display:block;margin-top:3px;padding:2px 5px;border-radius:4px;font-size:10.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;text-align:left;width:100%}
+.cal .d.empty{background:repeating-linear-gradient(-45deg,#fff,#fff 6px,#FBF6EE 6px,#FBF6EE 12px)}
+/* inspector */
+.insp{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--surface);border-left:1px solid var(--border);box-shadow:-10px 0 40px rgba(45,35,25,.14);z-index:60;transform:translateX(102%);transition:transform .22s;display:flex;flex-direction:column}
+.insp.open{transform:none}
+.insp .ih{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.insp .ih h2{font:500 24px/1.1 var(--display)}
+.insp .ib{padding:14px 18px;overflow-y:auto;flex:1}
+.insp #inspclose{margin-left:auto;font-size:22px;line-height:1;padding:2px 8px;color:var(--mute)}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:6px 12px;font-size:13px;margin:8px 0 14px}
+.kv dt{color:var(--mute)}
+.sec{margin:14px 0 6px}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin:5px 0}
+.check i{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border2);flex:none;margin-top:2px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px}
+.check i.y{background:var(--ok);border-color:var(--ok);color:#fff}
+.draft{background:var(--sunken);border-radius:10px;padding:12px 14px;font-size:13px;white-space:pre-wrap;line-height:1.55}
+.veil{position:fixed;inset:0;background:rgba(31,26,22,.25);z-index:55;display:none}
+.veil.on{display:block}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--canvas);padding:10px 18px;border-radius:999px;font-size:13px;z-index:90;transition:.22s;pointer-events:none;max-width:92vw}
+.toast.on{opacity:1;transform:translateX(-50%)}
+/* loop diagram */
+.loop{display:grid;grid-template-columns:1fr 46px 1fr;gap:0;align-items:stretch}
+.loop .node{border-radius:12px;padding:14px;border:1px solid var(--border)}
+.loop .node h4{font:500 22px/1.1 var(--display);margin-bottom:6px}
+.loop .node.alx{background:#F3E9E2;border-color:#E2C9BD}
+.loop .node.mz{background:var(--mez-mint);border-color:#A9CDB8}
+.loop .node.mz h4{font-family:'Anton',var(--sans);font-weight:400;font-size:21px;color:var(--mez);letter-spacing:.02em;text-transform:uppercase}
+.loop .arrows{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;font-size:20px;color:var(--mute)}
+.loop ul{list-style:none;font-size:12.5px;color:var(--ink2)}
+.loop li{padding:3px 0;border-top:1px dashed rgba(0,0,0,.08)}
+.loop li:first-child{border-top:0}
+.loop li b{font-weight:600;color:var(--ink)}
+/* tour */
+.tourlayer{position:fixed;inset:0;z-index:80;pointer-events:none}
+.tourhole{position:absolute;box-shadow:0 0 0 9999px rgba(31,26,22,.55);outline:2px solid var(--brass-fill);border-radius:10px;transition:all .32s;pointer-events:none}
+.tourcard{position:absolute;width:min(380px,calc(100vw - 24px));background:var(--surface);border-radius:14px;padding:16px 18px;box-shadow:0 16px 50px rgba(0,0,0,.25);pointer-events:auto}
+.tourcard h4{font:500 22px/1.15 var(--display);margin-bottom:6px}
+.tourcard p{font-size:13.5px;color:var(--ink2)}
+.tourcard .say{margin-top:10px;padding:9px 11px;background:var(--brick-soft);border-radius:8px;font-size:13px;color:var(--brick)}
+.tourcard .say:before{content:"Say: ";font-weight:600}
+.tourcard .tf{display:flex;align-items:center;gap:8px;margin-top:12px}
+.tourcard .tf .n{font:12px var(--mono);color:var(--mute);margin-right:auto}
+body.touring .main,body.touring .side{pointer-events:none}
+.invite{display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--canvas);padding:9px 26px;font-size:13px}
+.invite button{color:var(--canvas)}
+.invite .go{background:var(--brass-fill);color:var(--ink);padding:5px 12px;border-radius:999px;font-weight:600}
+.invite .x{margin-left:auto;opacity:.7}
+.hide{display:none!important}
+/* responsive (last) */
+@media (max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.split64,.split46{grid-template-columns:1fr}}
+@media (max-width:1000px){
+  .app{grid-template-columns:1fr}
+  .side{position:sticky;top:0;height:auto;z-index:70;flex-direction:row;align-items:center;padding:10px 14px;backdrop-filter:none}
+  .brand{border:0;margin:0;padding:0}
+  .brand .w{font-size:22px} .brand .s{display:none}
+  .side .foot{display:none}
+  .mtop{display:flex;margin-left:auto;gap:8px}
+  .mtop button{color:#EDE6DA;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 12px;font-size:12.5px}
+  #nav{position:fixed;top:52px;left:0;right:0;bottom:0;background:var(--iron);padding:12px;overflow-y:auto;display:none;z-index:70}
+  #nav.open{display:flex}
+  .ctx{top:52px;padding:10px 16px}
+  .wbody{padding:14px 16px 36px}
+  .demo-banner,.invite{padding-left:16px;padding-right:16px}
+  .insp{top:52px}
+}
+@media (max-width:760px){
+  .g3,.g2{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .stat b{font-size:26px}
+  .ctx h1{font-size:22px}
+  .ctx .crumb{display:none}
+  #tourBtn{display:none}
+  .scroll table.dt{min-width:620px}
+  .scroll table.dt th:first-child,.scroll table.dt td:first-child{position:sticky;left:0;background:var(--surface);z-index:1}
+  .cal .d{min-height:58px;padding:3px}
+  .cal .ev{font-size:9.5px;padding:1px 3px}
+  .loop{grid-template-columns:1fr}
+  .loop .arrows{flex-direction:row;padding:8px 0}
+  .hb{grid-template-columns:96px 1fr 64px}
+  .tourcard{left:12px!important;right:12px;bottom:12px;top:auto!important;width:auto}
+  .kv{grid-template-columns:110px 1fr}
+  .demo-banner span.long{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="w">The <i>Alexander</i></div><div class="s">Venue OS · 191 Alexander St</div></div>
+    <div class="mtop"><button id="tourM">Tour</button><button id="burger">Menu</button></div>
+    <nav id="nav"></nav>
+    <div class="foot">Built on <b>Telaia</b><br>Demo data · Nov 9, 2026</div>
+  </aside>
+  <div class="main">
+    <div class="invite" id="invite"><span>First time here? A 3-minute walkthrough shows the whole loop.</span><button class="go" id="inviteGo">Start the tour</button><button class="x" id="inviteX">Dismiss ✕</button></div>
+    <div class="demo-banner"><b>Demo.</b><span class="long">Venue facts come from the public listings; every client, booking and dollar figure is illustrative. La Mezcalería catering prices are their published offer.</span><button id="factsBtn">What's real?</button></div>
+    <header class="ctx"><div><div class="crumb" id="crumb"></div><h1 id="title"></h1></div><div class="sp"></div><span id="ctxr" style="display:flex;gap:8px"></span><button class="pill" id="tourBtn">▷ Walkthrough</button></header>
+    <main class="wbody" id="view"></main>
+  </div>
+</div>
+<div class="veil" id="veil"></div>
+<aside class="insp" id="insp"><div class="ih"><div><div class="lab" id="ilab"></div><h2 id="ititle"></h2></div><button id="inspclose" aria-label="Close">×</button></div><div class="ib" id="ibody"></div></aside>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const fmt=n=>'$'+Math.round(n).toLocaleString('en-CA');
+const fk=n=>n>=1000?'$'+(n/1000).toFixed(n>=10000?0:1)+'k':fmt(n);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let seed=191;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const TODAY=new Date(2026,10,9);
+const D=(m,d)=>new Date(2026,m,d);
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const dname=d=>d.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+window.__TRUNC__=[];
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2400)}
+
+/* ---------- data ---------- */
+const TYPES={
+  corp:{l:'Corporate & holiday',c:'var(--s2)'},
+  wed:{l:'Wedding & micro-wedding',c:'var(--s4)'},
+  pop:{l:'Pop-up & ticketed',c:'var(--s1)'},
+  prod:{l:'Production & shoot',c:'var(--s3)'},
+  priv:{l:'Private celebration',c:'var(--s5)'},
+  comm:{l:'Community & talks',c:'var(--s6)'}
+};
+const CATERERS=[
+  {id:'mez',name:'La Mezcalería',kind:'Preferred partner',real:true,pkgs:[['Taco bar',44],['Taco bar, plus',59],['Burrito tray party',19]],note:'Published offer, lamezcaleria.ca'},
+  {id:'brasa',name:'Brasa Supper Co.',kind:'Approved',pkgs:[['Family-style supper',78],['Canapé reception',52]]},
+  {id:'linden',name:'Linden Kitchen',kind:'Approved',pkgs:[['Plated three-course',96],['Brunch buffet',41]]},
+  {id:'own',name:'Client\'s own caterer',kind:'External',pkgs:[]}
+];
+const CLIENTS=['Northline Studios','Harbourline Analytics','Kettle & Pine Design','Railyard Games','Okafor–Lind wedding','Saltwater Agency','Pemberton Hall Foundation','Juniper Audio','Morrow & Vale LLP','The Brightwater Collective','Cedarcrest Realty','Tanaka–Reyes wedding','Fieldnote Coffee','Ironbark Architects','Sable & Rye','Gastown Makers Guild','Lumen Biotech','Copperleaf Films','Westerly Bikes','The Patel 40th'];
+const EV=[];
+function addEv(m,d,type,client,guests,hours,status,cat,extra){
+  const date=D(m,d);const hire=Math.max(2,hours)*500;
+  const catPP=cat==='mez'?pick([44,59]):cat==='brasa'?78:cat==='linden'?96:0;
+  EV.push(Object.assign({id:'EV-'+(1100+EV.length),date,type,client,guests,hours,status,cat,hire,catPP,
+    catering:catPP*guests,deposit:Math.round(hire*.5),paid:status==='confirmed'?Math.round(hire*(rnd()>.5?1:.5)):0},extra||{}));
+}
+// November
+addEv(10,6,'corp','Northline Studios',85,5,'confirmed','mez');
+addEv(10,7,'wed','Okafor–Lind wedding',96,9,'confirmed','linden');
+addEv(10,9,'prod','Copperleaf Films',22,10,'confirmed','own');
+addEv(10,12,'pop','Mezcal Thursdays · No. 1',64,4,'confirmed','mez',{series:'mt',tickets:64,price:65});
+addEv(10,13,'priv','The Patel 40th',70,5,'confirmed','brasa');
+addEv(10,14,'wed','Tanaka–Reyes wedding',100,9,'confirmed','linden');
+addEv(10,15,'pop','Gastown Makers Market',180,7,'confirmed','own',{tickets:0,vendors:14});
+addEv(10,18,'comm','Pláticas: The agave year',48,3,'confirmed','mez',{series:'pl',tickets:48,price:25});
+addEv(10,19,'pop','Mezcal Thursdays · No. 2',58,4,'confirmed','mez',{series:'mt',tickets:58,price:65});
+addEv(10,20,'corp','Harbourline Analytics',90,5,'confirmed','mez');
+addEv(10,21,'wed','Micro-wedding · Sato',40,6,'hold','brasa',{holdExp:D(10,11)});
+addEv(10,24,'prod','Juniper Audio shoot',12,8,'confirmed','own');
+addEv(10,26,'pop','Mezcal Thursdays · No. 3',40,4,'confirmed','mez',{series:'mt',tickets:31,price:65});
+addEv(10,27,'corp','Kettle & Pine Design',60,4,'confirmed','mez');
+addEv(10,28,'priv','Sable & Rye launch',100,5,'hold','brasa',{holdExp:D(10,10)});
+// December
+addEv(11,3,'pop','Mezcal Thursdays · No. 4',64,4,'confirmed','mez',{series:'mt',tickets:22,price:65});
+addEv(11,4,'corp','Railyard Games',95,5,'confirmed','mez');
+addEv(11,5,'corp','Saltwater Agency',80,5,'confirmed','brasa');
+addEv(11,10,'pop','Mezcal Thursdays · No. 5',64,4,'confirmed','mez',{series:'mt',tickets:9,price:65});
+addEv(11,9,'corp','Morrow & Vale LLP',75,5,'confirmed','linden');
+addEv(11,12,'corp','Lumen Biotech',100,5,'hold','mez',{holdExp:D(10,13)});
+addEv(11,13,'comm','Pemberton Hall Foundation',90,4,'confirmed','linden');
+addEv(11,17,'pop','Posada at the Alexander',100,5,'confirmed','mez',{series:'pos',tickets:41,price:85});
+addEv(11,18,'corp','Ironbark Architects',70,5,'hold','mez',{holdExp:D(10,16)});
+addEv(11,16,'priv','Cedarcrest Realty',90,5,'confirmed','brasa');
+addEv(11,31,'pop','New Year\'s Eve: Mezcal & vinyl',100,6,'hold','mez',{holdExp:D(10,20),series:'nye',tickets:0,price:120});
+// October history (for money trend)
+const HIST=[['Jun',24600],['Jul',28400],['Aug',22900],['Sep',27800],['Oct',31500]];
+
+const INQ=[
+  {id:'IQ-301',who:'Fernhill Robotics',src:'Tagvenue',type:'corp',guests:90,date:'Dec 12',got:'Nov 9 · 08:12',resp:null,budget:9000,msg:'Team holiday party, ~90, need food + bar, Saturday Dec 12.'},
+  {id:'IQ-300',who:'Amara & Josh',src:'Website',type:'wed',guests:60,date:'May 22, 2027',got:'Nov 8 · 21:40',resp:null,budget:14000,msg:'Spring micro-wedding, ceremony + dinner, love the brick.'},
+  {id:'IQ-299',who:'Daybreak Bakery',src:'Instagram DM',type:'pop',guests:120,date:'Weekends in Jan',got:'Nov 8 · 15:05',resp:'1h 20m',budget:0,msg:'Looking for a space for a monthly Sunday bake sale pop-up.'},
+  {id:'IQ-298',who:'Maple Leaf Productions',src:'Giggster',type:'prod',guests:18,date:'Nov 30',got:'Nov 7 · 11:30',resp:'3h 05m',budget:5000,msg:'Commercial shoot, 10-hour day, need load-in access.'},
+  {id:'IQ-297',who:'Rivera 50th',src:'Eventective',type:'priv',guests:75,date:'Jan 16, 2027',got:'Nov 6 · 19:22',resp:'14h 10m',budget:7000,msg:'50th birthday dinner, Mexican food would be amazing.'},
+  {id:'IQ-296',who:'Strathcona Writers Fest',src:'Email',type:'comm',guests:80,date:'Feb 2027',got:'Nov 5 · 10:00',resp:'2h 40m',budget:3000,msg:'Readings evening, community rate?'},
+  {id:'IQ-295',who:'Coastline Credit Union',src:'Tagvenue',type:'corp',guests:100,date:'Dec 19',got:'Nov 4 · 09:15',resp:'26h 00m',budget:11000,msg:'Member appreciation night.',lost:'Booked elsewhere — replied after 26 h'},
+  {id:'IQ-294',who:'Nova Skin Co.',src:'Website',type:'pop',guests:150,date:'Dec 6',got:'Nov 3 · 13:50',resp:'45m',budget:4000,msg:'Holiday pop-up shop, one day.'}
+];
+
+const LEADS=[
+  {n:'Fieldstone Interactive',seg:'corp',where:'Railtown · 140 staff',sig:'Hiring 12 roles; last party at a hotel ballroom',score:92,stage:'New',src:'Places + LinkedIn'},
+  {n:'Brightpath Health Tech',seg:'corp',where:'Gastown · 85 staff',sig:'Moved into Water St office in Sept',score:88,stage:'Drafted',src:'Places'},
+  {n:'Marlowe Event Planning',seg:'wed',where:'Planner · 30 weddings/yr',sig:'Posts heritage venues; none on Alexander St',score:86,stage:'Contacted',src:'Instagram'},
+  {n:'Hollis & Grey Studio',seg:'prod',where:'Photo studio · Strathcona',sig:'Rents brick lofts for editorials',score:81,stage:'New',src:'Giggster reviews'},
+  {n:'Tidewater Brewing',seg:'pop',where:'Brewery · East Van',sig:'Runs collab nights; no Gastown presence',score:79,stage:'Replied',src:'Places'},
+  {n:'Cascadia Design Week',seg:'comm',where:'Annual festival · Apr',sig:'Venue partners announced in Jan',score:77,stage:'New',src:'Web'},
+  {n:'Arbutus Law Group',seg:'corp',where:'Downtown · 60 staff',sig:'Holiday party last year at a closed venue',score:74,stage:'Drafted',src:'Places + LinkedIn'},
+  {n:'Kinfolk Supper Club',seg:'pop',where:'Roaming chef series',sig:'Sold out 6 dinners at 50 seats',score:73,stage:'Contacted',src:'Instagram'},
+  {n:'Lowtide Records',seg:'pop',where:'Label · Mount Pleasant',sig:'Listening parties, 80–120 cap',score:70,stage:'New',src:'Instagram'},
+  {n:'Westshore Bridal Collective',seg:'wed',where:'Planner network',sig:'Open house season Feb–Mar',score:68,stage:'New',src:'Web'},
+  {n:'Pacific Fintech Meetup',seg:'comm',where:'Monthly meetup · 90 RSVPs',sig:'Rotates venues; asks sponsors for space',score:64,stage:'Replied',src:'Meetup'},
+  {n:'Greywater Films',seg:'prod',where:'Production co.',sig:'Period pieces; needs heritage interiors',score:61,stage:'New',src:'Web'},
+  {n:'Saltspring Ceramics',seg:'pop',where:'Maker · 18k followers',sig:'Asked followers for a Vancouver pop-up date',score:58,stage:'New',src:'Instagram'},
+  {n:'Ridgeline Capital',seg:'corp',where:'Downtown · 40 staff',sig:'Client dinners quarterly',score:55,stage:'New',src:'LinkedIn'}
+];
+const SEG={corp:'Corporate',wed:'Weddings',prod:'Productions',pop:'Pop-ups & makers',comm:'Community'};
+
+/* derived */
+const inMonth=(m)=>EV.filter(e=>e.date.getMonth()===m);
+const conf=EV.filter(e=>e.status==='confirmed');
+const holds=EV.filter(e=>e.status==='hold');
+
+/* ---------- chart primitives ---------- */
+function hbars(rows,opt={}){const max=opt.max||Math.max(...rows.map(r=>r.v),1);
+  return rows.map(r=>`<div class="hb" ${r.attr||''}><div class="lbl" title="${esc(r.l)}">${esc(r.l)}${r.sub?`<small>${esc(r.sub)}</small>`:''}</div><div class="trk"><i style="width:${Math.max(1,r.v/max*100)}%;background:${r.c||'var(--brick-fill)'}"></i></div><div class="v">${r.f?r.f(r.v):r.v}</div></div>`).join('')}
+function splitBar(segs,f){const t=segs.reduce((a,s)=>a+s.v,0)||1;
+  return `<div class="split">${segs.filter(s=>s.v>0).map(s=>`<i title="${esc(s.l)}" style="flex:${s.v/t};background:${s.c}"></i>`).join('')}</div><div class="legend">${segs.map(s=>`<span><i class="sw" style="background:${s.c}"></i>${esc(s.l)} <b class="mono">${f?f(s.v):s.v}</b></span>`).join('')}</div>`}
+function cols(items,opt={}){const max=Math.max(...items.map(i=>i.v),1);
+  return `<div class="cols" style="height:${opt.h||100}px">${items.map(i=>`<div class="c" title="${esc(i.t||'')}"><i style="height:${i.v/max*100}%;background:${i.c||'var(--brick-fill)'}"></i></div>`).join('')}</div><div class="colx">${items.map(i=>`<span>${i.x||''}</span>`).join('')}</div>`}
+function meter(v,cap,c){const p=v/cap*100;return `<div class="meter"><i style="width:${Math.min(100,p)}%;background:${c||'var(--brick-fill)'}"></i></div>`}
+function cut(rows,n,key){if(rows.length<=n||state.more[key])return {rows,hidden:0};window.__TRUNC__.push({key,hidden:rows.length-n});return {rows:rows.slice(0,n),hidden:rows.length-n}}
+function moreBtn(h,key){return h?`<button class="moretog" data-more="${key}">Show ${h} more</button>`:''}
+const badge=s=>({confirmed:'<span class="b ok">Confirmed</span>',hold:'<span class="b warn">Hold</span>',inquiry:'<span class="b info">Inquiry</span>'}[s]||'');
+const tdot=t=>`<i class="sw" style="background:${TYPES[t].c}"></i>`;
+
+/* ---------- state + nav ---------- */
+const state={screen:'today',more:{},calM:10,leadSeg:'all',evFilter:'all'};
+const SCREENS=[
+  ['g','The venue'],
+  ['today','Today'],['calendar','Calendar & holds'],['inbox','Inquiries'],['events','Events & run-of-show'],
+  ['g','Revenue lines'],
+  ['catering','Catering'],['popups','Pop-ups & tickets'],
+  ['g','Growth'],
+  ['prospect','Prospecting'],['mez','Cross-promo · La Mezcalería'],
+  ['g','Back office'],
+  ['money','Money']
+];
+const TITLES={today:['Monday, November 9','Today'],calendar:['Nov – Dec 2026','Calendar & holds'],inbox:['All channels, one inbox','Inquiries'],events:['Bookings','Events & run-of-show'],catering:['Partners & orders','Catering'],popups:['Programme','Pop-ups & tickets'],prospect:['Outbound','Prospecting'],mez:['Partner venue','Cross-promotion with La Mezcalería'],money:['Deposits, balances, margin','Money']};
+function renderNav(){$('#nav').innerHTML=SCREENS.map(([id,l])=>id==='g'?`<div class="grp">${l}</div>`:`<button data-go="${id}" class="${state.screen===id?'on':''}"><i class="dot ${id==='mez'?'mezdot':''}"></i>${l}</button>`).join('')}
+function go(id,keep){state.screen=id;if(!keep)state.more={};closeNav();render();window.scrollTo(0,0)}
+function closeNav(){$('#nav').classList.remove('open');document.body.style.overflow=''}
+function render(){window.__TRUNC__=[];renderNav();const [c,t]=TITLES[state.screen];$('#crumb').textContent=c;$('#title').textContent=t;$('#ctxr').innerHTML='';$('#view').innerHTML=VIEWS[state.screen]();}
+
+/* ---------- screens ---------- */
+const VIEWS={};
+
+VIEWS.today=()=>{
+  const wk=EV.filter(e=>e.date>=TODAY&&e.date<D(10,16)).sort((a,b)=>a.date-b.date);
+  const nov=inMonth(10),dec=inMonth(11);
+  const unans=INQ.filter(i=>!i.resp&&!i.lost);
+  const novRev=nov.filter(e=>e.status==='confirmed').reduce((a,e)=>a+e.hire,0);
+  const expiring=holds.filter(h=>h.holdExp<=D(10,13));
+  const decFriSat=[];for(let d=1;d<=23;d++){const x=D(11,d);if(x.getDay()===5||x.getDay()===6)decFriSat.push(x)}
+  const decOpen=decFriSat.filter(x=>!EV.some(e=>iso(e.date)===iso(x)));
+  // 8-week utilisation
+  const weeks=[];for(let w=0;w<8;w++){const s=new Date(D(10,2).getTime()+w*7*864e5);const e=new Date(s.getTime()+7*864e5);const n=EV.filter(v=>v.date>=s&&v.date<e).length;weeks.push({v:n,x:s.getDate()+'/'+(s.getMonth()+1),c:n>=4?'var(--brick-fill)':n>=3?'var(--brass-fill)':'var(--border2)',t:n+' bookings'})}
+  return `
+  <p class="lede">Good morning. <b>${unans.length} new inquiries</b> are waiting, <b>${expiring.length} holds</b> expire this week, and December still has <b>${decOpen.length} open Friday/Saturday nights</b> — the most valuable dates of the year.</p>
+  <div class="grid g4" id="t-kpis">
+    <div class="card stat accent"><span class="lab">Booked · November</span><b>${fk(novRev)}</b>${(()=>{const p=Math.round((novRev/31500-1)*100);return `<span class="d ${p>=0?'up':'dn'}">${p>=0?'▲':'▼'} ${Math.abs(p)}% vs October</span>`})()}</div>
+    <div class="card stat"><span class="lab">Unanswered inquiries</span><b>${unans.length}</b><span class="d dn">Oldest: ${unans[unans.length-1].got.split('·')[0].trim()}</span></div>
+    <div class="card stat"><span class="lab">Holds expiring ≤ Fri</span><b>${expiring.length}</b><span class="d">${fk(expiring.reduce((a,e)=>a+e.hire+e.catering,0))} at stake</span></div>
+    <div class="card stat mz"><span class="lab">Mezcalería-catered · Nov</span><b>${nov.filter(e=>e.cat==='mez').length}</b><span class="d">events this month</span></div>
+  </div>
+  <div class="split64">
+    <div class="card" id="t-util"><div class="hd"><h3>Bookings per week</h3><span class="sub">The room is the inventory. Grey weeks are unsold nights.</span></div><div class="bd">${cols(weeks,{h:110})}<div class="legend" style="margin-top:10px"><span><i class="sw" style="background:var(--brick-fill)"></i>4+ nights</span><span><i class="sw" style="background:var(--brass-fill)"></i>3</span><span><i class="sw" style="background:var(--border2)"></i>2 or fewer</span></div></div></div>
+    <div class="card" id="t-dec"><div class="hd"><h3>December Fri & Sat</h3><span class="sub">${decFriSat.length-decOpen.length} of ${decFriSat.length} sold or held · closed Dec 24–27</span></div><div class="bd">${meter(decFriSat.length-decOpen.length,decFriSat.length)}<p class="muted" style="font-size:12.5px;margin:6px 0 10px">Still open: ${decOpen.map(d=>dname(d).replace(/^\w+, /,'')).join(' · ')}</p><button class="pill pri" data-go="prospect">Fill them from Prospecting →</button></div></div>
+  </div>
+  <div class="split64">
+    <div class="card"><div class="hd"><h3>This week in the room</h3><span class="sub">Tap an event for its run-of-show</span></div><div class="scroll"><table class="dt"><thead><tr><th>Date</th><th>Event</th><th class="r">Guests</th><th>Catering</th><th>Status</th></tr></thead><tbody>
+      ${wk.map(e=>`<tr class="click" data-ev="${e.id}"><td class="mono">${dname(e.date)}</td><td>${tdot(e.type)} ${esc(e.client)}</td><td class="r">${e.guests}</td><td>${e.cat==='mez'?'<span class="b mz">La Mezcalería</span>':esc(CATERERS.find(c=>c.id===e.cat).name)}</td><td>${badge(e.status)}</td></tr>`).join('')}
+    </tbody></table></div></div>
+    <div class="card" id="t-needs"><div class="hd"><h3>Needs you</h3></div><div class="bd" style="padding-top:6px">
+      ${unans.map(i=>`<div class="check" style="cursor:pointer" data-inq="${i.id}"><i></i><span><b>Reply to ${esc(i.who)}</b> · ${esc(i.src)} · ${i.guests} guests, ${esc(i.date)}</span></div>`).join('')}
+      ${expiring.map(h=>`<div class="check" style="cursor:pointer" data-ev="${h.id}"><i></i><span><b>Hold expires ${dname(h.holdExp)}</b> · ${esc(h.client)} — chase deposit or release</span></div>`).join('')}
+      <div class="check"><i></i><span><b>Mezcal Thursdays No. 5</b> has sold 9 of 64 — push the Mezcalería cross-post</span></div>
+      <div class="check"><i class="y">✓</i><span class="muted">Okafor–Lind balance received</span></div>
+    </div></div>
+  </div>`;
+};
+
+VIEWS.calendar=()=>{
+  const m=state.calM;const first=D(m,1);const start=new Date(first.getTime()-first.getDay()*864e5);
+  const cells=[];for(let i=0;i<42;i++){const d=new Date(start.getTime()+i*864e5);cells.push(d)}
+  const mev=inMonth(m);
+  const byType=Object.keys(TYPES).map(k=>({l:TYPES[k].l,v:mev.filter(e=>e.type===k).length,c:TYPES[k].c}));
+  const dow=[0,1,2,3,4,5,6].map(i=>{const days=cells.filter(d=>d.getMonth()===m&&d.getDay()===i);const used=days.filter(d=>mev.some(e=>iso(e.date)===iso(d))).length;return {l:DOW[i],v:Math.round(used/Math.max(1,days.length)*100),sub:used+' of '+days.length+' nights',c:used/days.length<.35?'var(--border2)':'var(--brick-fill)',f:v=>v+'%'}});
+  return `
+  <p class="lede">One calendar for the room — confirmed bookings, holds with expiry dates, pop-up series and shoots. <b>Mondays to Wednesdays are mostly empty</b>; that's where pop-ups, talks and productions earn their keep.</p>
+  <div class="chips">${[10,11].map(x=>`<button class="chip ${x===m?'on':''}" data-calm="${x}">${x===10?'November':'December'} 2026</button>`).join('')}</div>
+  <div class="split64">
+    <div class="card" id="c-dow"><div class="hd"><h3>Nights used, by weekday</h3><span class="sub">${m===10?'November':'December'}</span></div><div class="bd">${hbars(dow,{max:100})}</div></div>
+    <div class="card"><div class="hd"><h3>What the room sold</h3></div><div class="bd">${splitBar(byType)}<p class="muted" style="font-size:12px;margin-top:10px">Holds count here too — they block the date until released.</p></div></div>
+  </div>
+  <div class="card" id="c-grid"><div class="hd"><h3>${m===10?'November':'December'}</h3><span class="r legend">${Object.keys(TYPES).map(k=>`<span><i class="sw" style="background:${TYPES[k].c}"></i>${TYPES[k].l.split(' ')[0]}</span>`).join('')}<span><i class="sw" style="background:#fff;border:1.5px dashed var(--warn)"></i>Hold</span></span></div><div class="bd scroll"><div class="cal" style="min-width:560px">
+    ${DOW.map(d=>`<div class="dh">${d}</div>`).join('')}
+    ${cells.map(d=>{const evs=EV.filter(e=>iso(e.date)===iso(d));const out=d.getMonth()!==m;
+      return `<div class="d ${out?'out':''} ${iso(d)===iso(TODAY)?'today':''} ${!out&&!evs.length?'empty':''}"><span class="n">${d.getDate()}</span>${evs.map(e=>`<button class="ev" data-ev="${e.id}" style="${e.status==='hold'?`border:1.5px dashed var(--warn);color:var(--warn);background:var(--warn-soft)`:`background:${TYPES[e.type].c};color:#fff`}">${esc(e.client)}</button>`).join('')}</div>`}).join('')}
+  </div></div></div>
+  <div class="card"><div class="hd"><h3>Holds</h3><span class="sub">Auto-release at expiry unless a deposit lands. The client gets a reminder 48 h before.</span></div><div class="scroll"><table class="dt"><thead><tr><th>Client</th><th>Date</th><th>Expires</th><th class="r">Value</th><th></th></tr></thead><tbody>
+  ${holds.map(h=>`<tr class="click" data-ev="${h.id}"><td>${tdot(h.type)} ${esc(h.client)}</td><td class="mono">${dname(h.date)}</td><td class="mono" style="color:${h.holdExp<=D(10,13)?'var(--bad)':'inherit'}">${dname(h.holdExp)}</td><td class="r">${fmt(h.hire+h.catering)}</td><td>${badge('hold')}</td></tr>`).join('')}
+  </tbody></table></div></div>`;
+};
+
+VIEWS.inbox=()=>{
+  const srcs={};INQ.forEach(i=>srcs[i.src]=(srcs[i.src]||0)+1);
+  const respH=INQ.filter(i=>i.resp).map(i=>{const [h,m]=i.resp.match(/\d+/g).map(Number);return i.resp.includes('h')?h+(m||0)/60:h/60});
+  const rows=INQ.map(i=>{const r=i.resp?(i.resp.includes('h')?parseInt(i.resp):0)+(i.resp.includes('h')?(parseInt(i.resp.split('h')[1])||0)/60:parseInt(i.resp)/60):null;return {l:i.who,sub:i.src,v:r===null?0:r,c:r===null?'var(--bad)':r>12?'var(--warn)':'var(--ok)',f:v=>r===null?'waiting':v.toFixed(1)+' h'}});
+  return `
+  <p class="lede">Tagvenue, Giggster, Eventective, the website form, Instagram and email all land here. <b>Response time decides who books</b> — Coastline Credit Union went elsewhere after a 26-hour reply.</p>
+  <div class="split64">
+    <div class="card" id="i-resp"><div class="hd"><h3>Time to first reply</h3><span class="sub">Target: under 2 hours</span></div><div class="bd">${hbars(rows,{max:26})}</div></div>
+    <div class="card"><div class="hd"><h3>Where inquiries come from</h3><span class="sub">Last 7 days</span></div><div class="bd">${splitBar(Object.entries(srcs).map(([l,v],i)=>({l,v,c:`var(--s${i+1})`})))}<p class="muted" style="font-size:12px;margin-top:12px">Marketplace leads cost a fee; direct ones don't. Money shows the difference.</p></div></div>
+  </div>
+  <div class="card"><div class="hd"><h3>Inbox</h3><span class="sub">Tap one to see a drafted quote</span></div><div class="scroll"><table class="dt"><thead><tr><th>From</th><th>Channel</th><th>Type</th><th class="r">Guests</th><th>Date wanted</th><th>Status</th></tr></thead><tbody>
+  ${INQ.map(i=>`<tr class="click" data-inq="${i.id}"><td>${esc(i.who)}</td><td>${esc(i.src)}</td><td>${tdot(i.type)} ${TYPES[i.type].l.split(' ')[0]}</td><td class="r">${i.guests}</td><td>${esc(i.date)}</td><td>${i.lost?'<span class="b bad">Lost</span>':i.resp?'<span class="b n">Replied '+i.resp+'</span>':'<span class="b warn">New</span>'}</td></tr>`).join('')}
+  </tbody></table></div></div>`;
+};
+
+VIEWS.events=()=>{
+  const f=state.evFilter;let list=EV.filter(e=>e.date>=TODAY&&(f==='all'||e.type===f)).sort((a,b)=>a.date-b.date);
+  const {rows,hidden}=cut(list,10,'ev');
+  const val=Object.keys(TYPES).map(k=>({l:TYPES[k].l,v:EV.filter(e=>e.date>=TODAY&&e.type===k).reduce((a,e)=>a+e.hire+e.catering+(e.tickets||0)*(e.price||0),0),c:TYPES[k].c,f:fk}));
+  return `
+  <p class="lede">Every booking carries its contract, deposit schedule, floor plan, caterer, liquor plan and run-of-show. <b>The day-of sheet prints from here</b> — no more rebuilding it in a Google Doc.</p>
+  <div class="card" id="e-val"><div class="hd"><h3>Upcoming value by event type</h3><span class="sub">Room hire + catering + tickets, Nov 9 – Dec 31</span></div><div class="bd">${hbars(val.sort((a,b)=>b.v-a.v))}</div></div>
+  <div class="chips">${['all',...Object.keys(TYPES)].map(k=>`<button class="chip ${f===k?'on':''}" data-evf="${k}">${k==='all'?'All':TYPES[k].l}</button>`).join('')}</div>
+  <div class="card"><div class="scroll"><table class="dt"><thead><tr><th>Event</th><th>Date</th><th class="r">Guests</th><th>Caterer</th><th class="r">Value</th><th>Status</th></tr></thead><tbody>
+  ${rows.map(e=>`<tr class="click" data-ev="${e.id}"><td>${tdot(e.type)} ${esc(e.client)}</td><td class="mono">${dname(e.date)}</td><td class="r">${e.guests}</td><td>${e.cat==='mez'?'<span class="b mz">La Mezcalería</span>':esc(CATERERS.find(c=>c.id===e.cat).name)}</td><td class="r">${fmt(e.hire+e.catering+(e.tickets||0)*(e.price||0))}</td><td>${badge(e.status)}</td></tr>`).join('')}
+  </tbody></table></div>${moreBtn(hidden,'ev')}</div>`;
+};
+
+VIEWS.catering=()=>{
+  const up=EV.filter(e=>e.date>=D(10,1));
+  const byCat=CATERERS.map((c,i)=>({l:c.name,sub:c.kind,v:up.filter(e=>e.cat===c.id).reduce((a,e)=>a+e.catering,0),c:c.id==='mez'?'var(--mez-fill)':['','var(--s3)','var(--s5)','var(--border2)'][i],f:fk}));
+  const commission=.10;
+  const mezOrders=up.filter(e=>e.cat==='mez').sort((a,b)=>a.date-b.date);
+  const {rows,hidden}=cut(mezOrders,8,'cat');
+  return `
+  <p class="lede">The Alexander doesn't run a kitchen — it runs a <b>roster of caterers</b>. Each event picks one, the menu and headcount flow to the caterer automatically, and the venue's referral fee is tracked instead of remembered.</p>
+  <div class="split64">
+    <div class="card" id="k-share"><div class="hd"><h3>Catering booked through the venue</h3><span class="sub">Nov – Dec</span></div><div class="bd">${hbars(byCat)}<p class="muted" style="font-size:12px;margin-top:8px">“Client's own caterer” earns nothing today. A kitchen-access fee is one setting away.</p></div></div>
+    <div class="card"><div class="hd"><h3>Referral fees earned</h3><span class="sub">Proposed ${commission*100}% on partner catering</span></div><div class="bd"><span class="lab">Nov – Dec</span><div class="stat" style="padding:0"><b>${fk(byCat.slice(0,3).reduce((a,c)=>a+c.v,0)*commission)}</b></div>${splitBar(byCat.slice(0,3).map(c=>({l:c.l,v:Math.round(c.v*commission),c:c.c})),fk)}</div></div>
+  </div>
+  <div class="grid g3">
+    ${CATERERS.slice(0,3).map(c=>`<div class="card" ${c.id==='mez'?'style="border-top:3px solid var(--mez-fill)"':''}><div class="hd"><h3>${esc(c.name)}</h3><span class="r">${c.id==='mez'?'<span class="b mz">Preferred</span>':'<span class="b n">Approved</span>'}</span></div><div class="bd">${c.pkgs.map(p=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--sunken)"><span>${esc(p[0])}</span><span class="mono">${fmt(p[1])}/pp</span></div>`).join('')}<p class="muted" style="font-size:11.5px;margin-top:8px">${c.real?'Published offer, lamezcaleria.ca':'Illustrative partner'}</p></div></div>`).join('')}
+  </div>
+  <div class="card" id="k-orders"><div class="hd"><h3>Orders sent to La Mezcalería</h3><span class="sub">They see these in their own Telaia catering module</span></div><div class="scroll"><table class="dt"><thead><tr><th>Event</th><th>Date</th><th class="r">Guests</th><th>Package</th><th class="r">Order</th><th>Their status</th></tr></thead><tbody>
+  ${rows.map(e=>`<tr class="click" data-ev="${e.id}"><td>${esc(e.client)}</td><td class="mono">${dname(e.date)}</td><td class="r">${e.guests}</td><td>${e.catPP===59?'Taco bar, plus':'Taco bar'}</td><td class="r">${fmt(e.catering)}</td><td>${e.date<TODAY?'<span class="b ok">Delivered</span>':e.status==='hold'?'<span class="b warn">Pencilled</span>':'<span class="b info">Prep scheduled</span>'}</td></tr>`).join('')}
+  </tbody></table></div>${moreBtn(hidden,'cat')}</div>`;
+};
+
+VIEWS.popups=()=>{
+  const pops=EV.filter(e=>e.price).sort((a,b)=>a.date-b.date);
+  const mt=pops.filter(e=>e.series==='mt');
+  const sales=pops.map(e=>({l:e.client.replace('Mezcal Thursdays · ','MT '),sub:dname(e.date),v:e.tickets,c:e.tickets/e.guests>=.8?'var(--ok)':e.tickets/e.guests>=.4?'var(--brass-fill)':'var(--bad)',f:v=>v+' / '+e.guests}));
+  const gross=pops.reduce((a,e)=>a+e.tickets*e.price,0);
+  return `
+  <p class="lede">Pop-ups turn dead weeknights into revenue: ticketed dinners, tastings, markets and talks. <b>Mezcal Thursdays</b> with La Mezcalería is the anchor series — the venue sells the room and the tickets, they bring the bar and the kitchen.</p>
+  <div class="grid g4">
+    <div class="card stat accent"><span class="lab">Ticket revenue · Nov–Dec</span><b>${fk(gross)}</b><span class="d">across ${pops.length} ticketed nights</span></div>
+    <div class="card stat"><span class="lab">Weeknights filled</span><b>${pops.filter(e=>[1,2,3,4].includes(e.date.getDay())).length}</b><span class="d up">were empty in October</span></div>
+    <div class="card stat mz"><span class="lab">Mezcal Thursdays sold</span><b>${mt.reduce((a,e)=>a+e.tickets,0)}</b><span class="d">of ${mt.reduce((a,e)=>a+e.guests,0)} seats</span></div>
+    <div class="card stat"><span class="lab">Maker market vendors</span><b>14</b><span class="d">Nov 15 · $120 table fee</span></div>
+  </div>
+  <div class="split64">
+    <div class="card" id="p-sales"><div class="hd"><h3>Ticket sales by night</h3><span class="sub">Red = under 40% sold; time to push</span></div><div class="bd">${sales.map((s,i)=>hbars([s],{max:pops[i].guests})).join('')}</div></div>
+    <div class="card"><div class="hd"><h3>Revenue split · Mezcal Thursdays</h3><span class="sub">Proposed terms, per ticket at $65</span></div><div class="bd">${splitBar([{l:'La Mezcalería (food + mezcal)',v:39,c:'var(--mez-fill)'},{l:'The Alexander (room + staff)',v:20,c:'var(--brick-fill)'},{l:'Ticketing & card fees',v:6,c:'var(--border2)'}],fmt)}<p class="muted" style="font-size:12px;margin-top:10px">Settled automatically after each night — both sides see the same statement.</p></div></div>
+  </div>
+  <div class="card"><div class="hd"><h3>Vendor applications</h3><span class="sub">Pop-up hosts apply through a public form</span></div><div class="scroll"><table class="dt"><thead><tr><th>Applicant</th><th>Concept</th><th>Wants</th><th>Audience</th><th>Status</th></tr></thead><tbody>
+    <tr><td>Daybreak Bakery</td><td>Sunday bake sale</td><td>Monthly, Jan–Mar</td><td>9k IG followers</td><td><span class="b warn">Review</span></td></tr>
+    <tr><td>Kinfolk Supper Club</td><td>Roaming 50-seat dinner</td><td>2 Tuesdays</td><td>Sold out 6 of 6</td><td><span class="b info">Terms sent</span></td></tr>
+    <tr><td>Lowtide Records</td><td>Listening party</td><td>Jan 21</td><td>80–120 cap</td><td><span class="b warn">Review</span></td></tr>
+    <tr><td>Saltspring Ceramics</td><td>Studio sale</td><td>Weekend in Feb</td><td>18k followers</td><td><span class="b n">Prospect</span></td></tr>
+  </tbody></table></div></div>`;
+};
+
+VIEWS.prospect=()=>{
+  const seg=state.leadSeg;const list=LEADS.filter(l=>seg==='all'||l.seg===seg);
+  const {rows,hidden}=cut(list,9,'lead');
+  const stages=['Found & scored','Draft approved','Contacted','Replied','Site visit','Booked'];
+  const counts=[38,21,16,7,3,2];
+  const segBars=Object.keys(SEG).map((k,i)=>({l:SEG[k],v:LEADS.filter(l=>l.seg===k).length,c:TYPES[k].c}));
+  return `
+  <p class="lede">Every morning Telaia scans Gastown, Railtown and Strathcona for teams that just moved, hired or grew, plus planners, makers and productions that fit a 100-person brick room. <b>It drafts the first email; you decide what goes out.</b> Nothing sends on its own.</p>
+  <div class="split46">
+    <div class="card" id="r-funnel"><div class="hd"><h3>Pipeline · last 30 days</h3></div><div class="bd funnel">${stages.map((s,i)=>`<div class="st"><div class="bar" style="width:${Math.max(16,counts[i]/counts[0]*100)}%;background:${i===5?'var(--ok)':'var(--brick-fill)'};opacity:${1-i*.1}">${s}</div><span class="n">${counts[i]}</span></div>`).join('')}<p class="muted" style="font-size:12px;margin-top:8px">2 booked so far: Kettle & Pine (Nov 27) and Railyard Games (Dec 4).</p></div></div>
+    <div class="card"><div class="hd"><h3>Who we're finding</h3><span class="sub">${LEADS.length} scored leads this week</span></div><div class="bd">${hbars(segBars)}<div class="sec lab">December push</div><p style="font-size:13px">Corporate leads with 60–120 staff inside 2 km get a <b>holiday-party offer: room + La Mezcalería taco bar</b>, for the open Friday and Saturday nights.</p></div></div>
+  </div>
+  <div class="chips">${['all',...Object.keys(SEG)].map(k=>`<button class="chip ${seg===k?'on':''}" data-seg="${k}">${k==='all'?'All':SEG[k]}</button>`).join('')}</div>
+  <div class="card" id="r-list"><div class="scroll"><table class="dt"><thead><tr><th>Lead</th><th>Segment</th><th>Why now</th><th class="r">Fit</th><th>Stage</th></tr></thead><tbody>
+  ${rows.map(l=>`<tr class="click" data-lead="${esc(l.n)}"><td>${esc(l.n)}<div class="muted" style="font-size:12px">${esc(l.where)}</div></td><td>${tdot(l.seg)} ${SEG[l.seg]}</td><td style="font-size:12.5px">${esc(l.sig)}</td><td class="r"><span class="mono">${l.score}</span></td><td><span class="b ${l.stage==='Replied'?'ok':l.stage==='New'?'n':'info'}">${l.stage}</span></td></tr>`).join('')}
+  </tbody></table></div>${moreBtn(hidden,'lead')}</div>`;
+};
+
+VIEWS.mez=()=>{
+  const mezEv=EV.filter(e=>e.cat==='mez'&&e.date>=D(10,1));
+  const toMez=mezEv.reduce((a,e)=>a+e.catering,0)+EV.filter(e=>e.series==='mt').reduce((a,e)=>a+e.tickets*39,0);
+  const toAlx=[['Catering clients',4,14200,'needed a room'],['Diners',11,9600,'asked about private events'],['Their mailing list',38,2700,'bought Pláticas & Posada tickets']];
+  const months=[['Sep',3,1],['Oct',6,2],['Nov',11,5],['Dec',9,7]];
+  return `
+  <p class="lede">The Alexander and La Mezcalería are both on Telaia, so <b>they can share a calendar, pass leads and split revenue without spreadsheets</b>. Each keeps its own books and its own customers; the partnership is a set of agreed rules between the two systems.</p>
+  <div class="card" id="m-loop"><div class="hd"><h3>How the two venues feed each other</h3></div><div class="bd"><div class="loop">
+    <div class="node alx"><h4>The <i>Alexander</i></h4><ul><li><b>Room</b> for 100 in Gastown</li><li>Corporate & wedding <b>inquiries</b></li><li>Weeknights to <b>programme</b></li><li>Guests who want to come back for <b>dinner</b></li></ul></div>
+    <div class="arrows"><span>→</span><span>←</span></div>
+    <div class="node mz"><h4>La Mezcalería</h4><ul><li><b>Catering</b>: taco bar $44 / $59, burrito trays $19</li><li>Mezcal <b>bar programme</b> for pop-ups</li><li>Regulars who ask about <b>private events</b></li><li>15th anniversary, <b>April 2027</b></li></ul></div>
+  </div></div></div>
+  <div class="grid g2">
+    <div class="card stat accent"><span class="lab">Alexander → La Mezcalería · Nov–Dec</span><b>${fk(toMez)}</b><span class="d">catering orders + Mezcal Thursdays share</span></div>
+    <div class="card stat mz"><span class="lab">La Mezcalería → Alexander · Nov–Dec</span><b>${fk(toAlx.reduce((a,r)=>a+r[2],0))}</b><span class="d">room bookings from referred guests</span></div>
+  </div>
+  <div class="split64">
+    <div class="card" id="m-attr"><div class="hd"><h3>Referrals, both directions</h3><span class="sub">Tracked by referral code and by who the inquiry came through</span></div><div class="bd">
+      <div class="lab" style="margin-bottom:2px">Events catered by La Mezcalería</div>${hbars(months.map(([m,a])=>({l:m,v:a,c:'var(--mez-fill)'})),{max:11})}<div class="lab" style="margin:12px 0 2px">Room bookings referred by La Mezcalería</div>${hbars(months.map(([m,a,b])=>({l:m,v:b,c:'var(--brick-fill)'})),{max:11})}
+    </div></div>
+    <div class="card"><div class="hd"><h3>Where the Mezcalería referrals came from</h3></div><div class="bd">${hbars(toAlx.map(r=>({l:r[0],sub:r[1]+' '+r[3],v:r[2],c:'var(--mez-fill)',f:fk})))}</div></div>
+  </div>
+  <div class="card" id="m-cal"><div class="hd"><h3>Joint programme</h3><span class="sub">Co-branded, on both calendars and both Instagram schedules</span></div><div class="scroll"><table class="dt"><thead><tr><th>What</th><th>When</th><th>Where</th><th>Offer</th><th>Status</th></tr></thead><tbody>
+    <tr><td>Mezcal Thursdays (weekly)</td><td>Thursdays to Dec 10</td><td>The Alexander</td><td>$65: tasting flight + 4 plates</td><td><span class="b ok">Live</span></td></tr>
+    <tr><td>Pláticas: come eat and learn</td><td>Monthly</td><td>The Alexander</td><td>Attendees get 20% off dinner over $50 at La Mezcalería</td><td><span class="b ok">Live</span></td></tr>
+    <tr><td>Posada at the Alexander</td><td>Thu Dec 17</td><td>The Alexander</td><td>$85, catered by La Mezcalería</td><td><span class="b info">On sale</span></td></tr>
+    <tr><td>Holiday-party bundle</td><td>Dec Fri & Sat</td><td>The Alexander</td><td>Room + taco bar, one invoice</td><td><span class="b info">In outreach</span></td></tr>
+    <tr><td>“Book the room” card on La Mezcalería tables</td><td>Ongoing</td><td>1622 Commercial Dr</td><td>QR to the Alexander inquiry form, code MEZ</td><td><span class="b warn">Draft</span></td></tr>
+    <tr><td>La Mezcalería 15th anniversary</td><td>April 2027</td><td>Both venues</td><td>Gala night at the Alexander</td><td><span class="b n">Idea</span></td></tr>
+  </tbody></table></div></div>
+  <div class="card"><div class="hd"><h3>This week's co-branded posts</h3><span class="sub">Drafted in both brand voices; each venue approves its own</span></div><div class="grid g3 bd" style="margin:0">
+    ${[['Tue','The Alexander','Thursday is mezcal night. 64 seats, brick walls, a flight from La Mezcalería. Link in bio.'],['Wed','La Mezcalería','Our bar is popping up in Gastown this Thursday at the Alexander. Who’s coming?'],['Fri','Both · collab post','Holiday party, sorted: the room for 100 + our taco bar, one booking. A few December dates left.']].map(p=>`<div style="border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div class="lab" style="margin-bottom:4px">${p[0]} · ${p[1]}</div><p style="font-size:13px">${p[2]}</p></div>`).join('')}
+  </div></div>`;
+};
+
+VIEWS.money=()=>{
+  const novR=inMonth(10).filter(e=>e.status==='confirmed');const decR=inMonth(11).filter(e=>e.status==='confirmed');
+  const sum=a=>a.reduce((x,e)=>x+e.hire,0);
+  const trend=HIST.map(([m,v])=>({x:m,v,c:'var(--border2)',t:fmt(v)})).concat([{x:'Nov',v:sum(novR)+9000,c:'var(--brick-fill)'},{x:'Dec',v:sum(decR)+7200,c:'var(--brick-fill)'}]);
+  const due=conf.filter(e=>e.paid<e.hire&&e.date>=TODAY).sort((a,b)=>a.date-b.date);
+  const {rows,hidden}=cut(due,8,'due');
+  const lines=[{l:'Room hire',v:sum(novR)+sum(decR),c:'var(--brick-fill)'},{l:'Catering referral fees',v:Math.round(EV.filter(e=>e.cat!=='own').reduce((a,e)=>a+e.catering,0)*.1),c:'var(--mez-fill)'},{l:'Ticket share',v:EV.filter(e=>e.price).reduce((a,e)=>a+e.tickets*20,0),c:'var(--s3)'},{l:'Market table fees',v:1680,c:'var(--s5)'}];
+  return `
+  <p class="lede">Deposits, balances and partner settlements in one ledger. <b>Every booking knows what's been paid and what's next</b>, and reminders go out before the balance date, not after.</p>
+  <div class="split64">
+    <div class="card" id="money-trend"><div class="hd"><h3>Revenue by month</h3><span class="sub">Nov & Dec include confirmed bookings, catering fees and ticket share</span></div><div class="bd">${cols(trend,{h:120})}</div></div>
+    <div class="card"><div class="hd"><h3>Where Nov–Dec revenue comes from</h3></div><div class="bd">${splitBar(lines,fk)}<p class="muted" style="font-size:12px;margin-top:10px">Room hire is still 80%+. Catering fees and tickets are the new lines.</p></div></div>
+  </div>
+  <div class="card"><div class="hd"><h3>Balances due</h3><span class="sub">Auto-reminder 14 days before the event</span></div><div class="scroll"><table class="dt"><thead><tr><th>Client</th><th>Event date</th><th class="r">Paid</th><th class="r">Balance</th><th>Channel</th></tr></thead><tbody>
+  ${rows.map(e=>`<tr class="click" data-ev="${e.id}"><td>${esc(e.client)}</td><td class="mono">${dname(e.date)}</td><td class="r">${fmt(e.paid)}</td><td class="r"><b>${fmt(e.hire-e.paid)}</b></td><td>${['Direct','Tagvenue','Website','Direct'][parseInt(e.id.slice(3))%4]}</td></tr>`).join('')}
+  </tbody></table></div>${moreBtn(hidden,'due')}</div>`;
+};
+
+/* ---------- inspector ---------- */
+function openInsp(lab,title,html){$('#ilab').textContent=lab;$('#ititle').textContent=title;$('#ibody').innerHTML=html;$('#insp').classList.add('open');$('#veil').classList.add('on')}
+function closeInsp(){$('#insp').classList.remove('open');$('#veil').classList.remove('on')}
+function evDetail(id){const e=EV.find(x=>x.id===id);const c=CATERERS.find(x=>x.id===e.cat);
+  const ros=e.type==='pop'?[['5:00','Bar + kitchen load-in (La Mezcalería)'],['6:15','Door staff briefing, ticket scanner live'],['7:00','Doors'],['7:30','Flight 1 + talk from the mezcalero'],['9:30','Last pour'],['11:00','Load-out, room reset']]:
+    [['2:00','Load-in, rentals arrive via Alexander St'],['4:00','Caterer arrives · '+c.name],['5:30','Final walkthrough with client'],['6:00','Guests arrive'],['7:00','Dinner service'],['10:30','Last call'],['11:30','Load-out complete']];
+  openInsp(e.id+' · '+TYPES[e.type].l,e.client,`
+  <dl class="kv"><dt>Date</dt><dd>${dname(e.date)} · ${e.hours} h</dd><dt>Guests</dt><dd>${e.guests}</dd><dt>Status</dt><dd>${badge(e.status)}${e.holdExp?' · expires '+dname(e.holdExp):''}</dd><dt>Room hire</dt><dd>${fmt(e.hire)} <span class="muted">(${e.hours} h × $500)</span></dd><dt>Catering</dt><dd>${c.name}${e.catPP?' · '+fmt(e.catPP)+'/pp = '+fmt(e.catering):''}</dd>${e.price?`<dt>Tickets</dt><dd>${e.tickets} sold × ${fmt(e.price)}</dd>`:''}<dt>Paid</dt><dd>${fmt(e.paid)} of ${fmt(e.hire)}</dd></dl>
+  <div class="lab sec">Run-of-show</div>${ros.map(r=>`<div class="check"><span class="mono" style="width:44px">${r[0]}</span><span>${r[1]}</span></div>`).join('')}
+  <div class="lab sec">Before the day</div>
+  <div class="check"><i class="${e.status==='confirmed'?'y':''}">${e.status==='confirmed'?'✓':''}</i>Contract signed, deposit received</div>
+  <div class="check"><i class="${e.cat!=='own'?'y':''}">${e.cat!=='own'?'✓':''}</i>Caterer confirmed headcount and dietaries</div>
+  <div class="check"><i></i>Liquor plan confirmed — whose licence covers the bar (venue, caterer or a Special Event Permit). The venue confirms with LCRB; the system only tracks it.</div>
+  <div class="check"><i></i>Floor plan sent to client</div>
+  ${e.cat==='mez'?'<div class="check"><i class="y">✓</i>Order visible in La Mezcalería\'s catering queue</div>':''}
+  <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><button class="pill pri" data-toast="Day-of sheet ready to print">Print day-of sheet</button><button class="pill" data-toast="Balance reminder scheduled">Send balance reminder</button></div>`)}
+function inqDetail(id){const i=INQ.find(x=>x.id===id);const mez=['corp','priv'].includes(i.type);
+  const hours=i.type==='prod'?10:i.type==='wed'?8:5;
+  const draft=`Hi ${i.who.split(' ')[0]},\n\nThanks for thinking of the Alexander. ${i.date} ${i.type==='corp'?'is open for now':'looks possible'} — the room is 3,200 sq ft of restored brick and seats ${Math.min(100,i.guests)}.\n\nRough numbers for ${i.guests} guests:\n• Room, ${hours} hours: ${fmt(hours*500)}\n${mez?`• La Mezcalería taco bar: ${fmt(44*i.guests)} ($44/pp) or ${fmt(59*i.guests)} for the fuller bar\n`:''}\nI can hold the date for 72 hours while you check with the team. Want to come see it this week?\n\n— The Alexander`;
+  openInsp(i.id+' · '+i.src,i.who,`<dl class="kv"><dt>Received</dt><dd>${i.got}</dd><dt>Wants</dt><dd>${i.guests} guests · ${esc(i.date)}</dd><dt>Budget</dt><dd>${i.budget?fmt(i.budget):'—'}</dd>${i.lost?`<dt>Outcome</dt><dd><span class="b bad">${esc(i.lost)}</span></dd>`:''}</dl>
+  <div class="lab sec">Their message</div><p style="font-size:13px;margin-bottom:12px">“${esc(i.msg)}”</p>
+  <div class="lab sec">Drafted reply + quote</div><div class="draft">${esc(draft)}</div>
+  <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="pill pri" data-toast="Reply sent · 72 h hold placed">Send & place hold</button><button class="pill" data-toast="Opened for editing">Edit</button></div>`)}
+function leadDetail(n){const l=LEADS.find(x=>x.n===n);
+  const msg=l.seg==='corp'?`Hi —\n\nSaw ${l.n} has been growing (${l.sig.toLowerCase()}). If a holiday or team night is on the list, we're a 100-person restored brick room on Alexander St, a few minutes from you.\n\nOne booking covers the room and La Mezcalería's taco bar ($44/pp). We still have a couple of December Fridays.\n\nHappy to walk you through it — 15 minutes, whenever suits.`:
+   l.seg==='pop'?`Hi —\n\nWe love what you're doing. The Alexander has weeknights open for pop-ups: 100 standing, brick, Gastown. We sell tickets through our system and settle with you the next day.\n\nWould a Tuesday or Wednesday in January work?`:
+   `Hi —\n\nThe Alexander is a 3,200 sq ft heritage brick room at 191 Alexander St. ${l.seg==='prod'?'Full-day production rates and load-in from the street.':'We host 100 seated and work with a short list of caterers, including La Mezcalería.'}\n\nCould I send a few photos and dates?`;
+  openInsp('Lead · '+SEG[l.seg],l.n,`<dl class="kv"><dt>Who</dt><dd>${esc(l.where)}</dd><dt>Why now</dt><dd>${esc(l.sig)}</dd><dt>Found via</dt><dd>${esc(l.src)}</dd><dt>Fit score</dt><dd>${l.score} / 100</dd></dl>
+  ${meter(l.score,100)}
+  <div class="lab sec">Draft first message</div><div class="draft">${esc(msg)}</div>
+  <p class="muted" style="font-size:12px;margin-top:8px">Drafts are never sent automatically. Check the person and the details before sending.</p>
+  <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="pill pri" data-toast="Queued for your review">Approve draft</button><button class="pill" data-toast="Follow-up set for 5 days">Follow up in 5 days</button></div>`)}
+function factsPanel(){openInsp('Sources','What\'s real in this demo',`
+  <div class="lab sec">From the public listings (Tagvenue, Giggster, Eventective)</div>
+  <div class="check"><i class="y">✓</i>191 Alexander Street, Gastown</div>
+  <div class="check"><i class="y">✓</i>3,200 sq ft of restored brick in a 111-year-old building</div>
+  <div class="check"><i class="y">✓</i>100 seated / 100 standing (Eventective lists up to 120)</div>
+  <div class="check"><i class="y">✓</i>From $500/hour, 2-hour minimum (Tagvenue)</div>
+  <div class="check"><i class="y">✓</i>In-house or external catering, ticketed events allowed</div>
+  <div class="lab sec">From La Mezcalería's own site</div>
+  <div class="check"><i class="y">✓</i>Taco bar $44 / $59 per person, burrito tray $19 per person</div>
+  <div class="check"><i class="y">✓</i>1622 Commercial Drive; 15th anniversary in April 2027</div>
+  <div class="lab sec">Illustrative</div>
+  <p style="font-size:13px">Every client, inquiry, lead, booking, ticket count, revenue figure, the 10% referral fee and the ticket split. The colours and type are a placeholder — we couldn't find a website for the Alexander, so we'll match your real brand once we have it.</p>`)}
+
+/* ---------- events ---------- */
+document.addEventListener('click',ev=>{
+  if(document.body.classList.contains('touring')&&!ev.target.closest('.tourcard'))return;
+  const t=ev.target.closest('[data-go],[data-ev],[data-inq],[data-lead],[data-more],[data-calm],[data-seg],[data-evf],[data-toast]');
+  if(!t)return;const d=t.dataset;
+  if(d.go)go(d.go);else if(d.ev)evDetail(d.ev);else if(d.inq)inqDetail(d.inq);else if(d.lead)leadDetail(d.lead);
+  else if(d.more){state.more[d.more]=1;render()}else if(d.calm){state.calM=+d.calm;render()}
+  else if(d.seg){state.leadSeg=d.seg;state.more={};render()}else if(d.evf){state.evFilter=d.evf;state.more={};render()}
+  else if(d.toast)toast(d.toast);
+});
+$('#inspclose').onclick=closeInsp;$('#veil').onclick=closeInsp;
+$('#burger').onclick=()=>{const n=$('#nav');n.classList.toggle('open');document.body.style.overflow=n.classList.contains('open')?'hidden':''};
+$('#factsBtn').onclick=factsPanel;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!tour.on)closeInsp()});
+
+/* ---------- tour ---------- */
+const TOUR=[
+  {at:{screen:'today'},target:null,t:'The Alexander, run as one system',b:'Inquiries, the calendar, caterers, pop-ups, outbound sales and the La Mezcalería partnership — on one screen instead of five marketplaces and a spreadsheet.',say:'Let me show you a normal Monday at the Alexander.'},
+  {at:{screen:'today'},target:'#t-kpis',t:'The morning answer',b:'What sold, what is waiting for a reply, which holds expire, and how much is going through La Mezcalería.',say:'This is the first thing you see every morning.'},
+  {at:{screen:'today'},target:'#t-dec',t:'December is the inventory',b:'Every unsold Friday and Saturday in December is money that never comes back. The system counts them and sends you to the fix.',say:'Your most valuable nights of the year, and how many are left.'},
+  {at:{screen:'calendar'},target:'#c-dow',t:'Weeknights are the opportunity',b:'Mondays to Wednesdays sit empty. Pop-ups, talks and productions are how they start earning.',say:'Here is where the room sits idle.'},
+  {at:{screen:'calendar'},target:'#c-grid',t:'One calendar, holds included',b:'Holds show as dashed and release themselves at expiry unless a deposit lands. No double-booking across Tagvenue, Giggster and your inbox.',say:'Every channel writes to this one calendar.'},
+  {at:{screen:'inbox'},target:'#i-resp',t:'Speed books the room',b:'Every inquiry from every channel lands in one inbox with a drafted quote. The red bar is a lead that went elsewhere after a 26-hour wait.',say:'The first reply usually wins the booking.'},
+  {at:{screen:'catering'},target:'#k-share',t:'A roster of caterers, not a kitchen',b:'Each event picks a caterer. Menu and headcount go straight to them, and your referral fee is tracked.',say:'You don\'t cook, but you can still earn on the food.'},
+  {at:{screen:'catering'},target:'#k-orders',t:'La Mezcalería sees the order',b:'Because both venues are on Telaia, the order appears in La Mezcalería\'s own catering queue — no forwarding emails.',say:'They get the order the moment you confirm.'},
+  {at:{screen:'popups'},target:'#p-sales',t:'Pop-ups fill the dead nights',b:'Mezcal Thursdays is the anchor series. Ticket sales show which nights need a push, and settlements split automatically.',say:'This is how a Tuesday starts making money.'},
+  {at:{screen:'prospect'},target:'#r-funnel',t:'Outbound, every morning',b:'Telaia finds teams that just moved, hired or grew nearby, plus planners and makers, scores them, and drafts the first message. You approve every send.',say:'You don\'t have to wait for Tagvenue to send you people.'},
+  {at:{screen:'mez'},target:'#m-loop',t:'Two venues feeding each other',b:'The Alexander has the room; La Mezcalería has the food, the bar and a loyal list. Both are on Telaia, so leads and revenue move both ways.',say:'This is the partnership, written into the system.'},
+  {at:{screen:'mez'},target:'#m-cal',t:'One programme, both calendars',b:'Mezcal Thursdays, Pláticas, the Posada and the holiday-party bundle appear on both calendars and both Instagram schedules.',say:'You plan it once and it shows up at both venues.'},
+  {at:{screen:'money'},target:'#money-trend',t:'Where it lands',b:'Room hire plus the new lines: catering referral fees and ticket share. Balances chase themselves.',say:'And here is what it adds up to.'},
+  {at:{screen:'today'},target:null,t:'That\'s the loop',b:'More inquiries answered faster, fuller weeknights, December sold, and a partner sending guests both ways. Click anything to explore.',say:'What would you want to see first for your own room?'}
+];
+const tour={on:false,i:0};
+function tourStart(){tour.on=true;tour.i=0;document.body.classList.add('touring');$('#invite').classList.add('hide');tourShow()}
+function tourEnd(){tour.on=false;document.body.classList.remove('touring');const l=$('#tl');if(l)l.remove()}
+function tourShow(){const s=TOUR[tour.i];closeInsp();if(state.screen!==s.at.screen)go(s.at.screen);
+  let l=$('#tl');if(!l){l=document.createElement('div');l.id='tl';l.className='tourlayer';l.innerHTML='<div class="tourhole" id="th"></div><div class="tourcard" id="tc"></div>';document.body.appendChild(l)}
+  const el=s.target?document.querySelector(s.target):null;const hole=$('#th'),card=$('#tc');window.__TOURTARGET__=!!el;
+  card.innerHTML=`<h4>${s.t}</h4><p>${s.b}</p><div class="say">${s.say}</div><div class="tf"><span class="n">${tour.i+1} / ${TOUR.length}</span><button class="pill" id="tp" ${tour.i?'':'disabled style="opacity:.4"'}>Back</button><button class="pill pri" id="tn">${tour.i===TOUR.length-1?'Finish':'Next'}</button><button class="pill" id="tx">✕</button></div>`;
+  $('#tp').onclick=()=>{if(tour.i){tour.i--;tourShow()}};$('#tn').onclick=()=>{if(tour.i<TOUR.length-1){tour.i++;tourShow()}else tourEnd()};$('#tx').onclick=tourEnd;
+  const place=()=>{const vw=innerWidth,vh=innerHeight;
+    if(!el){hole.style.cssText='left:50%;top:50%;width:0;height:0';card.style.left=Math.max(12,(vw-card.offsetWidth)/2)+'px';card.style.top=Math.max(12,(vh-card.offsetHeight)/2)+'px';return}
+    const r=el.getBoundingClientRect();hole.style.cssText=`left:${r.left-6}px;top:${r.top-6}px;width:${r.width+12}px;height:${r.height+12}px`;
+    if(vw<=760)return;const ch=card.offsetHeight,cw=card.offsetWidth;let top,left=Math.min(Math.max(12,r.left),vw-cw-12);
+    if(r.height>vh*.6){left=r.right+16+cw<vw?r.right+16:Math.max(12,r.left-cw-16);top=Math.max(12,Math.min(r.top,vh-ch-12))}
+    else if(vh-r.bottom>ch+24)top=r.bottom+14;else if(r.top>ch+24)top=r.top-ch-14;else top=vh-ch-12;
+    card.style.left=left+'px';card.style.top=top+'px'};
+  if(el){const r=el.getBoundingClientRect();const off=innerWidth<=1000?130:90;if(r.top<off||r.bottom>innerHeight-40)window.scrollBy(0,r.top-off)}
+  requestAnimationFrame(place)}
+addEventListener('resize',()=>{if(tour.on)tourShow()});
+addEventListener('keydown',e=>{if(!tour.on)return;if(e.key==='ArrowRight')$('#tn').click();if(e.key==='ArrowLeft')$('#tp').click();if(e.key==='Escape')tourEnd()});
+$('#tourBtn').onclick=tourStart;$('#tourM').onclick=tourStart;$('#inviteGo').onclick=tourStart;$('#inviteX').onclick=()=>$('#invite').classList.add('hide');
+window.__TOURLEN__=TOUR.length;window.__TOUR__={start:tourStart,go:i=>{tour.i=i;tourShow()},end:tourEnd};
+
+render();
+if(/[?&]tour=1/.test(location.search)||location.hash==='#tour')tourStart();
+</script>
+</body>
+</html>
